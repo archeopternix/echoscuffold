@@ -1,0 +1,34 @@
+{{define "model" -}}
+// Generated code - do not modify will be overwritten!!
+package main
+
+type {{.Name}} struct {
+	Id     int     `json:"id"`
+{{range .Fields}}	{{.Name}}	{{template "types" .}}{{.Object}}	`json:"{{lowercase .Name}}"`
+{{end}}}
+
+func (obj .Name) ID() (jsonField string, value interface{}) {
+	value = obj.Id
+	jsonField = "id"
+	return
+}
+
+// Database access functions
+// retrieve all entries for specified Object
+func getAll{{plural .Name}}() (err error, entities []{{.Name}}) {
+	err = Database.Open({{.Name}}{}).Where("id", ">", 0).Get().AsEntity(&entities)
+	if err != nil {
+		panic(err)
+	}
+	return err, entities
+}
+
+// retrieve the entry with specific Id
+func get{{.Name}}ById(id int) (err error, entity {{.Name}}) {
+	err = Database.Open({{.Name}}{}).Where("id", "=", id).First().AsEntity(&entity)
+	if err != nil {
+		panic(err)
+	}
+	return err, entity
+}
+{{end}}

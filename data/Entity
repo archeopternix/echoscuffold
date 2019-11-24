@@ -1,0 +1,34 @@
+[
+	{
+		"fields": [
+			{
+				"name": "Name",
+				"object": "",
+				"type": 1
+			},
+			{
+				"name": "Accounts",
+				"object": "Account",
+				"type": 4
+			}
+		],
+		"id": 3,
+		"name": "Role"
+	},
+	{
+		"id": 4,
+		"name": "User",
+		"fields": [
+			{
+				"name": "Name",
+				"type": 1,
+				"object": ""
+			},
+			{
+				"name": "Email",
+				"type": 1,
+				"object": ""
+			}
+		]
+	}
+]

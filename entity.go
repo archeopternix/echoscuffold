@@ -1,6 +1,10 @@
 // AccountManager project main.go
 package main
 
+import (
+	"time"
+)
+
 // Entity relates to an 'Object' or struct
 type Entity struct {
 	Id     int     `json:"id"`
@@ -37,6 +41,10 @@ func (e Entity) ID() (jsonField string, value interface{}) {
 	value = e.Id
 	jsonField = "id"
 	return
+}
+
+func (e Entity) TimeStamp() string {
+	return time.Now().Format(time.UnixDate)
 }
 
 // Database access functions

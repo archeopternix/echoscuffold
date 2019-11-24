@@ -1,0 +1,31 @@
+{{define "content"}}
+                       <div class="card events-card">      
+                            <div class="card-table">
+                                <div class="content">
+                                    <table class="table is-fullwidth is-striped">
+                                     <thead>
+                                      <tr>
+                                      <th>Id</th>	
+                                      {{range .Fields}}<th>{{.Name}}</th>	
+                                      {{end}}
+                                      </tr>
+                                    </thead>
+                                        <tbody>
+                                            {{"{{"}}range $index,value := .map{{"}}"}}
+                                            <tr>
+                                            {{"{{"}}range $index,value := .map{{"}}"}}
+                                                <td width="5%"><a href="#" >New</a></td>
+                                                <td>Lorum ipsum dolem aire</td>
+                                                <td class="level-right"><a class="button is-small is-primary" href="#">Action</a></td>
+                                                {{"{{end}}"}}
+                                            </tr>
+                                            {{"{{end}}"}}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <footer class="card-footer">
+                               <a href="#" class="card-footer-item button is-link is-light">New</a>
+                             </footer>                           
+                        </div>             
+{{end}}

@@ -123,7 +123,7 @@ func main() {
 	// Rendering the sidenav
 	sidenavtmpl, err := template.New("sidenav").Funcs(funcMap).ParseFiles("template/sidenav.html")
 	if err != nil {
-		log.Fatalf("Create sidenav template: %s", err)
+		log.Fatalf("Parse sidenav template: %s", err)
 	}
 	var output *os.File
 	defer output.Close()
@@ -137,24 +137,23 @@ func main() {
 		log.Fatalf("template execution: %s", err)
 	}
 
-	/*
-		// Rendering the view components
-		listtmpl, _ := template.New("base").Funcs(funcMap).ParseFiles("template/base.html", "template/list.html")
+	// 		listtmpl, _ := template.New("list").Funcs(funcMap).ParseFiles("template/base.html", "template/list.html")
 
+	// Rendering the listview components
+	listtmpl, _ := template.New("content").Funcs(funcMap).ParseFiles("template/list.html")
+	if err != nil {
+		log.Fatalf("Parse list template: %s", err)
+	}
+	for _, e := range obj.Entities {
+		var output *os.File
+		defer output.Close()
+
+		output, _ = os.Create(config.ApplicationPath + "/view/" + strings.ToLower(e.Name) + "list.html")
+
+		err = listtmpl.ExecuteTemplate(output, "content", e)
 		if err != nil {
 			log.Fatalf("template execution: %s", err)
 		}
+	}
 
-		for _, e := range entities {
-			var output *os.File
-			defer output.Close()
-
-			output, _ = os.Create("view/" + strings.ToLower(e.Name) + "list.html")
-
-			err = listtmpl.ExecuteTemplate(output, "base", e)
-			if err != nil {
-				log.Fatalf("template execution: %s", err)
-			}
-		}
-	*/
 }

@@ -1,4 +1,6 @@
-{{define "content"}}
+{{define "content" -}}
+{{"{{"}}define "content" {{"}}"}}
+<!-- Time: {{.TimeStamp}} -->
                        <div class="card events-card">      
                             <div class="card-table">
                                 <div class="content">
@@ -6,8 +8,8 @@
                                      <thead>
                                       <tr>
                                         <th>Id</th>	
-                                        {{range .Fields}}<th>{{.Name}}</th>	
-                                        {{end}}
+                                        {{range .Fields}}<th>{{.Name}}</th>
+                                        {{end -}}
                                       </tr>
                                     </thead>
                                         <tbody>
@@ -15,7 +17,7 @@
                                           <tr>
                                             <td>{{"{{ .Id }}"}}</td>
                                             {{range .Fields}}<td>{{"{{ ."}}{{.Name}} {{"}}"}}</td>	
-                                            {{end}}
+                                            {{end -}}
                                             <td class="level-right"><a class="button is-small is-secondary" href="/{{lowercase .Name}}/delete/{{"{{.Id}}"}}">Delete</a></td>
                                             <td class="level-right"><a class="button is-small is-primary" href="/{{lowercase .Name}}/edit/{{"{{.Id}}"}}">Edit</a></td>
                                           </tr>
@@ -27,5 +29,6 @@
                             <footer class="card-footer">
                                <a href="/{{lowercase .Name}}/new" class="card-footer-item button is-link is-light">New</a>
                              </footer>                           
-                        </div>             
+                        </div>    
+{{"{{"}}end{{"}}"}}         
 {{end}}

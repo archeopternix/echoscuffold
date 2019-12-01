@@ -32,4 +32,37 @@ func get{{.Name}}ById(id int) (err error, entity {{.Name}}) {
 	}
 	return err, entity
 }
+
+// Handler: Edit
+func edit{{.Name}}(c echo.Context) error {
+	id, _ := strconv.Atoi(c.Param("id"))
+
+	err, {{lowercase .Name}} := get{{.Name}}ById(driver, id)
+	if err != nil {
+		panic(err)
+	}
+
+	return c.Render(http.StatusOK, "{{lowercase .Name}}detail", {{lowercase .Name}})
+}
+
+// Handler: Delete
+func delete{{.Name}}(c echo.Context) error {
+	id, _ := strconv.Atoi(c.Param("id"))
+
+	err, {{lowercase .Name}} := get{{.Name}}ById(driver, id)
+	if err != nil {
+		panic(err)
+	}
+	err = driver.Delete({{lowercase .Name}})
+	if err != nil {
+		panic(err)
+	}
+	
+	err, {{.Name | plural | lowercase }} = getAll{{plural .Name}}()
+		if err != nil {
+		panic(err)
+	}
+
+	return c.Render(http.StatusOK, "{{lowercase .Name}}list", {{.Name | plural | lowercase}})
+}
 {{end}}

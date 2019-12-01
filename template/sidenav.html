@@ -1,0 +1,25 @@
+            {{define "sidenav"}}
+            {{"{{"}}define "sidenav" {{"}}"}}
+                <aside class="menu is-hidden-mobile">
+                    <p class="menu-label">
+                        General
+                    </p>
+                    <ul class="menu-list">
+                        <li><a class="is-active" href="/">Dashboard</a></li>
+                        <li><a>Other</a></li>
+                    </ul>
+                    <p class="menu-label">
+                        Administration
+                    </p>
+                    <ul class="menu-list">
+                    {{range .Entities}}
+                        <li><a href="/{{lowercase .Name}}/list">{{.Name}}</a></li>
+                          <ul>
+                              <li><a href="/{{lowercase .Name}}/list">{{plural .Name}}</a></li>
+                              <li><a href="/{{lowercase .Name}}/new">Add {{.Name}}</a></li>
+                          </ul>
+                    {{end}}
+                     </ul>
+                </aside>
+            {{"{{"}}end{{"}}"}}
+            {{end}}

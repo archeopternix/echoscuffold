@@ -1,0 +1,52 @@
+{{define "main" -}}
+package main
+
+import (
+	"io"
+	"net/http"
+	"strconv"
+	"text/template"
+
+	"github.com/labstack/echo"
+	"github.com/labstack/echo/middleware"
+	"github.com/sonyarouje/simdb/db"
+)
+
+var driver *db.Driver
+
+
+func main() {
+	// Database initialisation
+	_, driver = InitializeDb()
+
+	// Echo instance
+	e := echo.New()
+	renderer := &Template{
+		templates: template.Must(template.ParseGlob("view/*.html")),
+	}
+	
+	{{range .Entities}}
+	{{lowercase .Name}}listtmpl, _ := template.New("base").Funcs(funcMap).ParseFiles("view/base.html", "view/{{lowercase .Name}}list.html")
+	{{end}}
+	
+	e.Renderer = renderer
+
+	// Middleware
+	e.Use(middleware.Logger())
+	e.Use(middleware.Recover())
+
+	// Routes
+	e.GET("/", dashboard) // Opens Dashboard
+	{{range .Entities}}
+	// routes for {{.Name}}
+	e.GET("/{{lowercase .Name}}", list{{plural .Name}})
+	e.POST("/{{lowercase .Name}}", create{{.Name}})
+	e.GET("/{{lowercase .Name}}//:id", get{{.Name}})
+	e.PUT("/{{lowercase .Name}}//:id", update{{.Name}})
+	e.DELETE("/{{lowercase .Name}}//:id", delete{{.Name}})
+	{{end}}
+	
+	// Start server
+	e.Logger.Fatal(e.Start(":80"))
+}
+{{end}}

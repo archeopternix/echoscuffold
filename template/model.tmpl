@@ -33,8 +33,21 @@ func get{{.Name}}ById(id int) (err error, entity {{.Name}}) {
 	return err, entity
 }
 
-// Handler: Edit
-func edit{{.Name}}(c echo.Context) error {
+// -------------------------------
+// Handlers
+// -------------------------------
+
+// list handler
+func list{{plural .Name}}(c echo.Context) error {
+	err, {{.Name | plural | lowercase}} := getAll{{plural .Name}}()
+	if err != nil {
+		panic(err)
+	}
+	return c.Render(http.StatusOK, "{{lowercase .Name}}list", {{.Name | plural | lowercase}})
+}
+
+// get handler
+func get{{.Name}}(c echo.Context) error {
 	id, _ := strconv.Atoi(c.Param("id"))
 
 	err, {{lowercase .Name}} := get{{.Name}}ById(driver, id)
@@ -45,7 +58,37 @@ func edit{{.Name}}(c echo.Context) error {
 	return c.Render(http.StatusOK, "{{lowercase .Name}}detail", {{lowercase .Name}})
 }
 
-// Handler: Delete
+// create handler
+func create{{.Name}}(c echo.Context) error {
+	{{lowercase .Name}} := new({{.Name}})
+  	if err := c.Bind(u); err != nil {
+  	  return
+  	}
+
+	err = driver.Insert({{lowercase .Name}})
+	if err != nil {
+		panic(err)
+	}
+
+	return c.Render(http.StatusOK, "{{lowercase .Name}}detail", {{lowercase .Name}})
+}
+
+// update handler
+func update{{.Name}}(c echo.Context) error {
+	{{lowercase .Name}} := new({{.Name}})
+  	if err := c.Bind(u); err != nil {
+  	  return
+  	}
+
+	err = driver.Update({{lowercase .Name}})
+	if err != nil {
+		panic(err)
+	}
+
+	return c.Render(http.StatusOK, "{{lowercase .Name}}detail", {{lowercase .Name}})
+}
+
+// delete handler
 func delete{{.Name}}(c echo.Context) error {
 	id, _ := strconv.Atoi(c.Param("id"))
 
@@ -65,4 +108,10 @@ func delete{{.Name}}(c echo.Context) error {
 
 	return c.Render(http.StatusOK, "{{lowercase .Name}}list", {{.Name | plural | lowercase}})
 }
+
+	e.GET("/{{lowercase .Name}}", list{{plural .Name}})
+	e.POST("/{{lowercase .Name}}", create{{.Name}})
+	e.GET("/{{lowercase .Name}}//:id", get{{.Name}})
+	e.PUT("/{{lowercase .Name}}//:id", update{{.Name}})
+	e.DELETE("/{{lowercase .Name}}//:id", delete{{.Name}})
 {{end}}

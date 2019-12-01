@@ -136,6 +136,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("template execution: %s", err)
 	}
+	output.Close()
 
 	// 		listtmpl, _ := template.New("list").Funcs(funcMap).ParseFiles("template/base.html", "template/list.html")
 
@@ -155,5 +156,28 @@ func main() {
 			log.Fatalf("template execution: %s", err)
 		}
 	}
+
+	// Application classes:
+	// Copy of database.go
+	err = copyFile("database.go", config.ApplicationPath+"database.go")
+	if err != nil {
+		log.Fatalf("Copy of .go files: %s", err)
+	}
+
+	// Rendering the main.go
+	maintmpl, err := template.New("main").Funcs(funcMap).ParseFiles("template/main.tmpl")
+	if err != nil {
+		log.Fatalf("Parse main.go template: %s", err)
+	}
+
+	output, err = os.Create(config.ApplicationPath + "/main.go")
+	if err != nil {
+		log.Fatalf("File creation: %s", err)
+	}
+	err = maintmpl.ExecuteTemplate(output, "main", obj)
+	if err != nil {
+		log.Fatalf("template execution: %s", err)
+	}
+	output.Close()
 
 }

@@ -8,7 +8,7 @@ type {{.Name}} struct {
 {{range .Fields}}	{{.Name}}	{{template "types" .}}{{.Object}}	`json:"{{lowercase .Name}}"`
 {{end}}}
 
-func (obj .Name) ID() (jsonField string, value interface{}) {
+func (obj {{.Name}}) ID() (jsonField string, value interface{}) {
 	value = obj.Id
 	jsonField = "id"
 	return
@@ -50,7 +50,7 @@ func list{{plural .Name}}(c echo.Context) error {
 func get{{.Name}}(c echo.Context) error {
 	id, _ := strconv.Atoi(c.Param("id"))
 
-	err, {{lowercase .Name}} := get{{.Name}}ById(driver, id)
+	err, {{lowercase .Name}} := get{{.Name}}ById(id)
 	if err != nil {
 		panic(err)
 	}
@@ -59,10 +59,10 @@ func get{{.Name}}(c echo.Context) error {
 }
 
 // create handler
-func create{{.Name}}(c echo.Context) error {
+func create{{.Name}}(c echo.Context) (err error) {
 	{{lowercase .Name}} := new({{.Name}})
-  	if err := c.Bind(u); err != nil {
-  	  return
+  	if err = c.Bind({{lowercase .Name}}); err != nil {
+  	  panic(err)
   	}
 
 	err = driver.Insert({{lowercase .Name}})
@@ -74,9 +74,9 @@ func create{{.Name}}(c echo.Context) error {
 }
 
 // update handler
-func update{{.Name}}(c echo.Context) error {
+func update{{.Name}}(c echo.Context) (err error) {
 	{{lowercase .Name}} := new({{.Name}})
-  	if err := c.Bind(u); err != nil {
+  	if err = c.Bind({{lowercase .Name}}); err != nil {
   	  return
   	}
 
@@ -90,9 +90,11 @@ func update{{.Name}}(c echo.Context) error {
 
 // delete handler
 func delete{{.Name}}(c echo.Context) error {
+	var {{.Name | plural | lowercase }} []{{.Name}}
+
 	id, _ := strconv.Atoi(c.Param("id"))
 
-	err, {{lowercase .Name}} := get{{.Name}}ById(driver, id)
+	err, {{lowercase .Name}} := get{{.Name}}ById(id)
 	if err != nil {
 		panic(err)
 	}
@@ -108,10 +110,4 @@ func delete{{.Name}}(c echo.Context) error {
 
 	return c.Render(http.StatusOK, "{{lowercase .Name}}list", {{.Name | plural | lowercase}})
 }
-
-	e.GET("/{{lowercase .Name}}", list{{plural .Name}})
-	e.POST("/{{lowercase .Name}}", create{{.Name}})
-	e.GET("/{{lowercase .Name}}//:id", get{{.Name}})
-	e.PUT("/{{lowercase .Name}}//:id", update{{.Name}})
-	e.DELETE("/{{lowercase .Name}}//:id", delete{{.Name}})
 {{end}}

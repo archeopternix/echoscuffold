@@ -28,13 +28,14 @@ type Config struct {
 }
 
 func (c Config) CreateTargetApp() {
-	_, err := os.Lstat(c.ApplicationPath + "/model")
+	/*_, err := os.Lstat(c.ApplicationPath + "/model")
 	if err != nil {
 		err = os.Mkdir(c.ApplicationPath+"/model", os.ModeDir)
 		if err != nil {
 			log.Fatalf("Subdir created: %s", err)
 		}
 	}
+	*/
 	_, err = os.Lstat(c.ApplicationPath + "/view")
 	if err != nil {
 		err = os.Mkdir(c.ApplicationPath+"/view", os.ModeDir)
@@ -101,7 +102,7 @@ func main() {
 		defer output.Close()
 		obj.Object = e
 
-		output, err = os.Create(config.ApplicationPath + "/model/" + e.Name + ".go")
+		output, err = os.Create(config.ApplicationPath + "/" + e.Name + ".go")
 		if err != nil {
 			log.Fatalf("File creation: %s", err)
 		}
@@ -159,7 +160,7 @@ func main() {
 
 	// Application classes:
 	// Copy of database.go
-	err = copyFile("database.go", config.ApplicationPath+"database.go")
+	err = copyFile("database.go", config.ApplicationPath+"/database.go")
 	if err != nil {
 		log.Fatalf("Copy of .go files: %s", err)
 	}

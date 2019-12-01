@@ -7,8 +7,8 @@
 				"type": 1
 			},
 			{
-				"name": "Accounts",
-				"object": "Account",
+				"name": "Users",
+				"object": "User",
 				"type": 4
 			}
 		],

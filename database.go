@@ -25,24 +25,25 @@ func (c Counter) ID() (jsonField string, value interface{}) {
 
 // Sample Code:
 // fmt.Println(NextId("product"))
-func NextId(table string) (err error, id int) {
-
+func NextId(table string) (id int) {
 	//AsEntity takes a pointer to Counter variable (not an array pointer)
 	var counter Counter
-	err = Database.Open(Counter{}).Where("table", "=", table).First().AsEntity(&counter)
+
+	err := Database.Open(Counter{}).Where("table", "=", table).First().AsEntity(&counter)
+
 	if err != nil {
 		err = Database.Insert(Counter{Table: table, Number: 1})
 		if err != nil {
-			return err, 0
+			panic(err)
 		}
-		return nil, 1
+		return 1
 	}
 	counter.Number++
 	err = Database.Update(counter)
 	if err != nil {
-		return err, 0
+		panic(err)
 	}
-	return nil, counter.Number
+	return counter.Number
 
 }
 

@@ -14,11 +14,12 @@
                     </p>
                     <ul class="menu-list">
                     {{range .Entities}}
-                        <li><a href="/{{lowercase .Name}}/list">{{.Name}}</a></li>
+                        <li><a href="/{{.Name | plural | lowercase}}">{{.Name}}</a>
                           <ul>
-                              <li><a href="/{{lowercase .Name}}/list">{{plural .Name}}</a></li>
-                              <li><a href="/{{lowercase .Name}}/new">Add {{.Name}}</a></li>
+                              <li><a href="/{{.Name | plural | lowercase}}">{{plural .Name}}</a></li>
+                              <li><a href="/{{.Name | plural | lowercase}}/0">Add {{.Name}}</a></li>
                           </ul>
+                        </li>
                     {{end}}
                      </ul>
                 </aside>

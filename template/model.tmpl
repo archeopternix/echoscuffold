@@ -3,8 +3,15 @@
 // Time: {{.TimeStamp}}
 package main
 
+import (
+	"github.com/labstack/echo"
+	"net/http"
+	"fmt"
+	"strconv"
+)
+
 type {{.Name}} struct {
-	Id     int     `json:"id"`
+	Id     string     `json:"id"`
 {{range .Fields}}	{{.Name}}	{{template "types" .}}{{.Object}}	`json:"{{lowercase .Name}}"`
 {{end}}}
 
@@ -17,7 +24,7 @@ func (obj {{.Name}}) ID() (jsonField string, value interface{}) {
 // Database access functions
 // retrieve all entries for specified Object
 func getAll{{plural .Name}}() (err error, entities []{{.Name}}) {
-	err = Database.Open({{.Name}}{}).Where("id", ">", 0).Get().AsEntity(&entities)
+	err = Database.Open({{.Name}}{}).Get().AsEntity(&entities)
 	if err != nil {
 		panic(err)
 	}
@@ -25,7 +32,7 @@ func getAll{{plural .Name}}() (err error, entities []{{.Name}}) {
 }
 
 // retrieve the entry with specific Id
-func get{{.Name}}ById(id int) (err error, entity {{.Name}}) {
+func get{{.Name}}ById(id string) (err error, entity {{.Name}}) {
 	err = Database.Open({{.Name}}{}).Where("id", "=", id).First().AsEntity(&entity)
 	if err != nil {
 		panic(err)
@@ -48,7 +55,7 @@ func list{{plural .Name}}(c echo.Context) error {
 
 // get handler
 func get{{.Name}}(c echo.Context) error {
-	id, _ := strconv.Atoi(c.Param("id"))
+	id := c.Param("id")
 
 	err, {{lowercase .Name}} := get{{.Name}}ById(id)
 	if err != nil {
@@ -58,47 +65,62 @@ func get{{.Name}}(c echo.Context) error {
 	return c.Render(http.StatusOK, "{{lowercase .Name}}detail", {{lowercase .Name}})
 }
 
+// new handler
+func new{{.Name}}(c echo.Context) error {
+	{{lowercase .Name}} := new({{.Name}})
+	return c.Render(http.StatusOK, "{{lowercase .Name}}detail", {{lowercase .Name}})
+}
+
 // create handler
 func create{{.Name}}(c echo.Context) (err error) {
+	fmt.Println("create")
 	{{lowercase .Name}} := new({{.Name}})
   	if err = c.Bind({{lowercase .Name}}); err != nil {
   	  panic(err)
   	}
-
-	err = driver.Insert({{lowercase .Name}})
+	{{lowercase .Name}}.Id = strconv.Itoa(NextId({{.Name | printf "%q"}}))
+	err = Database.Insert({{lowercase .Name}})
 	if err != nil {
 		panic(err)
 	}
-
-	return c.Render(http.StatusOK, "{{lowercase .Name}}detail", {{lowercase .Name}})
+	err, {{.Name | plural | lowercase}} := getAll{{plural .Name}}()
+	if err != nil {
+		panic(err)
+	}
+	return c.Render(http.StatusOK, "{{lowercase .Name}}list", {{.Name | plural | lowercase}})
 }
 
 // update handler
 func update{{.Name}}(c echo.Context) (err error) {
+	fmt.Println("update")
 	{{lowercase .Name}} := new({{.Name}})
   	if err = c.Bind({{lowercase .Name}}); err != nil {
   	  return
   	}
 
-	err = driver.Update({{lowercase .Name}})
+	err = Database.Update({{lowercase .Name}})
 	if err != nil {
 		panic(err)
 	}
 
-	return c.Render(http.StatusOK, "{{lowercase .Name}}detail", {{lowercase .Name}})
+	err, {{.Name | plural | lowercase}} := getAll{{plural .Name}}()
+	if err != nil {
+		panic(err)
+	}
+	return c.Render(http.StatusOK, "{{lowercase .Name}}list", {{.Name | plural | lowercase}})
 }
 
 // delete handler
 func delete{{.Name}}(c echo.Context) error {
 	var {{.Name | plural | lowercase }} []{{.Name}}
 
-	id, _ := strconv.Atoi(c.Param("id"))
+	id := c.Param("id")
 
 	err, {{lowercase .Name}} := get{{.Name}}ById(id)
 	if err != nil {
 		panic(err)
 	}
-	err = driver.Delete({{lowercase .Name}})
+	err = Database.Delete({{lowercase .Name}})
 	if err != nil {
 		panic(err)
 	}

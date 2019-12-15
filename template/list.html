@@ -1,5 +1,6 @@
-{{define "content" -}}
-{{"{{"}}define "content" {{"}}"}}
+{{define "list" -}}
+{{"{{"}}define "{{lowercase .Name}}list" {{"}}"}}
+{{"{{"}}template "base" {{"}}"}}
 <!-- Time: {{.TimeStamp}} -->
                        <div class="card events-card">      
                             <div class="card-table">
@@ -13,13 +14,15 @@
                                       </tr>
                                     </thead>
                                         <tbody>
-                                          {{"{{"}}range $index,value := .map{{"}}"}}
+                                          {{"{{"}}range .{{"}}"}}
                                           <tr>
-                                            <td>{{"{{ .Id }}"}}</td>
+                                            <td>{{"{{.Id}}"}}</td>
                                             {{range .Fields}}<td>{{"{{ ."}}{{.Name}} {{"}}"}}</td>	
                                             {{end -}}
-                                            <td class="level-right"><a class="button is-small is-secondary" href="/{{lowercase .Name}}/delete/{{"{{.Id}}"}}">Delete</a></td>
-                                            <td class="level-right"><a class="button is-small is-primary" href="/{{lowercase .Name}}/edit/{{"{{.Id}}"}}">Edit</a></td>
+                                            <td><form method="post" action="/{{.Name | plural | lowercase}}/{{"{{.Id}}"}}/delete" name="{{"{{.Id}}"}}">
+                                              <button class="button is-primary">Delete</button>
+                                              </form>  </td>                                          
+                                              <td><a class="button is-link" href="/{{.Name | plural | lowercase}}/{{"{{.Id}}"}}">Edit</a></td>
                                           </tr>
                                           {{"{{end}}"}}
                                         </tbody>
@@ -27,8 +30,9 @@
                                 </div>
                             </div>
                             <footer class="card-footer">
-                               <a href="/{{lowercase .Name}}/new" class="card-footer-item button is-link is-light">New</a>
+                                <a class="button is-primary" href="/{{.Name | plural | lowercase}}/new" >New</a>        
                              </footer>                           
                         </div>    
+{{"{{"}}template "_footer" {{"}}"}}
 {{"{{"}}end{{"}}"}}         
 {{end}}

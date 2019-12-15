@@ -1,87 +1,12 @@
 {{define "base"}}
-<!DOCTYPE html>
-<html>
-
-<head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Admin - Free Bulma template</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
-    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,700" rel="stylesheet">
-    <!-- Bulma Version 0.8.x-->
-    <link rel="stylesheet" href="https://unpkg.com/bulma@0.8.0/css/bulma.min.css" />
-</head>
-<body>
-  {{block "mainnav" .}}
-    <!-- START NAV -->
-    <nav class="navbar is-white">
-        <div class="container">
-            <div class="navbar-brand">
-                <a class="navbar-item brand-text" href="/">
-                  Home
-                </a>
-            </div>
-        </div>
-    </nav>
-    <!-- END NAV -->
-    {{end}}
+{{template "_header" .}}
+{{template "_mainnav" .}}
       <div class="container">
         <div class="columns">
             <div class="column is-3 ">
-            {{block "sidenav" .}}
-
-                <aside class="menu is-hidden-mobile">
-                    <p class="menu-label">
-                        General
-                    </p>
-                    <ul class="menu-list">
-                        <li><a class="is-active">Dashboard</a></li>
-                        <li><a>Customers</a></li>
-                        <li><a>Other</a></li>
-                    </ul>
-                    <p class="menu-label">
-                        Administration
-                    </p>
-                    <ul class="menu-list">
-                        <li><a>Team Settings</a></li>
-                        <li>
-                            <a>Manage Your Team</a>
-                            <ul>
-                                <li><a>Members</a></li>
-                                <li><a>Plugins</a></li>
-                                <li><a>Add a member</a></li>
-                                <li><a>Remove a member</a></li>
-                            </ul>
-                        </li>
-                        <li><a>Invitations</a></li>
-                     </ul>
-                </aside>
-            {{end}}
+{{template "sidenav" .}}
             </div>
-
             <div class="column is-9">
-
-                <section class="hero is-info welcome is-small">
-                    <div class="hero-body">
-                        <div class="container">
-                            <h1 class="title">
-                                Hello, Admin.
-                            </h1>
-                            <h2 class="subtitle">
-                                I hope you are having a great day!
-                            </h2>
-                        </div>
-                    </div>
-                </section>
-          <br>  
-{{block "content" .}}
-DUMMY
-{{end}}                  
-            </div>
-        </div>
-    </div>
-</body>
-
-</html>
+{{template "_hero" .}}
+<!-- here comes the content -->
 {{end}}

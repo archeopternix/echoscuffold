@@ -1,0 +1,74 @@
+{{define "detail" -}}
+{{"{{"}}define "{{lowercase .Name}}detail" {{"}}"}}
+{{"{{"}}template "base" {{"}}"}}
+<!-- Time: {{.TimeStamp}} -->
+                      <form method="post" action="/{{.Name | plural | lowercase}}{{"{{if .Id}}"}}/{{"{{.Id}}"}}" name="{{"{{.Id}}"}}{{"{{end}}"}}">
+                        <input type="hidden" id="id" name="id" value="{{"{{.Id}}"}}">     
+                        <div class="card events-card">      
+                            <div class="card-table">
+                              <div class="content">
+                                {{range .Fields}}
+                                <div class="field">
+                                  <label class="label">{{.Name}}</label>
+                                  <div class="control">
+                                    <input class="input" type="text" placeholder="Text input" name="{{.Name | lowercase}}" id="{{.Name | lowercase}}" value="{{"{{"}}.{{.Name}}{{"}}"}}">
+                                  </div>
+                                </div>
+                                {{end -}}
+                              </div>
+                            </div>                      
+                            <footer class="card-footer">
+                              <div class="field is-grouped">
+                                <div class="control">
+                                  <button type="submit" class="button is-success" name="action" value="0">
+                                    <span class="icon is-small">
+                                      <i class="fas fa-check"></i>
+                                    </span>
+                                    <span>Save</span>
+                                  </button>
+                                </div>                                
+                           </footer>
+                        </div>
+                      </form>
+{{"{{"}}template "_footer" {{"}}"}}
+{{"{{"}}end{{"}}"}}         
+{{end}}
+
+{{define "fieldtypes"}}
+{{- if eq .Type 1}}               <div class="field">
+                                    <label class="label">{{.Name}}</label>
+                                    <div class="control">
+                                      <input class="input" type="text" placeholder="Text input" name="{{.Name | lowercase}}" id="{{.Name | lowercase}}" value="{{"{{.Name}}"}}">
+                                    </div>
+                                  </div>{{end}}
+{{- if eq .Type 2}}               <div class="field">
+                                    <label class="label">{{.Name}}</label>
+                                    <div class="control">
+                                      <input class="input" type="number" step="1" placeholder="Integer input" name="{{.Name | lowercase}}" id="{{.Name | lowercase}}" value="{{"{{.Name}}"}}">
+                                    </div>
+                                  </div>{{end}}
+{{- if eq .Type 3}}               <div class="field">
+                                    <div class="control">
+                                      <label class="radio">
+                                        <input type="radio" name="{{.Name | lowercase}}" id="{{.Name | lowercase}}">
+                                        Yes
+                                      </label>
+                                      <label class="radio">
+                                        <input type="radio" name="{{.Name | lowercase}}" id="{{.Name | lowercase}}">
+                                        No
+                                      </label>
+                                    </div>
+                                  </div>{{end}}
+{{- if eq .Type 4}}               <div class="field">
+                                    <label class="label">{{.Name}}</label>
+                                    <div class="control">
+                                      <div class="select">
+                                        <select name="{{.Name | lowercase}}" id="{{.Name | lowercase}}" value="{{"{{.Name}}"}}">
+                                         {{"{{"}}range {{.Name}}{{"}}"}}
+                                          <option>{{"{{.}}"}}</option>
+                                        {{"{{end}}"}}
+                                        </select>
+                                      </div>
+                                    </div>
+                                  </div>{{end}}
+{{- end}}

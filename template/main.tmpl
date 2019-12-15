@@ -4,7 +4,6 @@ package main
 import (
 	"io"
 	"net/http"
-	"strconv"
 	"text/template"
 
 	"github.com/labstack/echo"
@@ -15,41 +14,30 @@ import (
 var driver *db.Driver
 
 
-// Define the template registry struct
-type TemplateRegistry struct {
-	templates map[string]*template.Template
+type Template struct {
+	templates *template.Template
 }
 
-// Implement e.Renderer interface
-func (t *TemplateRegistry) Render(w io.Writer, name string, data interface{}, c echo.Context) error {
-	tmpl, ok := t.templates[name]
-	if !ok {
-		err := errors.New("Template not found -> " + name)
-		return err
-	}
-	return tmpl.ExecuteTemplate(w, "base.html", data)
+func (t *Template) Render(w io.Writer, name string, data interface{}, c echo.Context) error {
+	return t.templates.ExecuteTemplate(w, name, data)
 }
 
 func dashboard(c echo.Context) error {
-	return c.JSON(http.StatusOK, "Erfolg!")
+	return c.Render(http.StatusOK, "dashboard", "")
 }
 
 func main() {
 	// Database initialisation
-	_, driver = InitializeDb()
+//	_, driver = InitializeDb()
 
 	// Echo instance
 	e := echo.New()
 	// Instantiate a template registry with an array of template set
 	// Ref: https://gist.github.com/rand99/808e6e9702c00ce64803d94abff65678
-	templates := make(map[string]*template.Template)
-	{{range .Entities -}}
-	templates["{{lowercase .Name}}list.html"] = template.Must(template.ParseFiles("view/{{lowercase .Name}}list.html", "view/base.html", "view/sidenav.html"))
-	{{end}}
-	e.Renderer = &TemplateRegistry{
-		templates: templates,
+	renderer := &Template{
+		templates: template.Must(template.ParseGlob("view/*.html")),
 	}
-
+	e.Renderer = renderer
 
 	// Middleware
 	e.Use(middleware.Logger())
@@ -59,11 +47,12 @@ func main() {
 	e.GET("/", dashboard) // Opens Dashboard
 	{{range .Entities}}
 	// routes for {{.Name}}
-	e.GET("/{{lowercase .Name}}", list{{plural .Name}})
-	e.POST("/{{lowercase .Name}}", create{{.Name}})
-	e.GET("/{{lowercase .Name}}//:id", get{{.Name}})
-	e.PUT("/{{lowercase .Name}}//:id", update{{.Name}})
-	e.DELETE("/{{lowercase .Name}}//:id", delete{{.Name}})
+	e.GET("/{{.Name | plural | lowercase }}", list{{plural .Name}})
+	e.GET("/{{.Name | plural | lowercase }}/:id", get{{.Name}})
+	e.GET("/{{.Name | plural | lowercase }}/new", new{{.Name}})
+	e.POST("/{{.Name | plural | lowercase }}", create{{.Name}})
+	e.POST("/{{.Name | plural | lowercase }}/:id", update{{.Name}})
+	e.POST("/{{.Name | plural | lowercase }}/:id/delete", delete{{.Name}})
 	{{end}}
 	
 	// Start server

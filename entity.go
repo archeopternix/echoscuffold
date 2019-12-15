@@ -28,7 +28,7 @@ const (
 )
 
 func NewEntity() (e *Entity) {
-	_, id := NextId("Entity")
+	id := NextId("Entity")
 	e = &Entity{Id: id}
 	return e
 }

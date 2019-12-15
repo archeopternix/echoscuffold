@@ -36,7 +36,7 @@ func (c Config) CreateTargetApp() {
 		}
 	}
 	*/
-	_, err = os.Lstat(c.ApplicationPath + "/view")
+	_, err := os.Lstat(c.ApplicationPath + "/view")
 	if err != nil {
 		err = os.Mkdir(c.ApplicationPath+"/view", os.ModeDir)
 		if err != nil {
@@ -58,11 +58,9 @@ func copyFile(src, dst string) error {
 	if err != nil {
 		return err
 	}
-
 	if !sourceFileStat.Mode().IsRegular() {
 		return fmt.Errorf("%s is not a regular file", src)
 	}
-
 	source, err := os.Open(src)
 	if err != nil {
 		return err
@@ -83,7 +81,7 @@ var config Config
 func main() {
 	var err error
 	var obj ObjectModel
-	config.ApplicationPath = "/Users/Andreas Eisner/go/src/testcrud"
+	config.ApplicationPath = "/Users/Andreas Eisner/go/src/test"
 	config.CreateTargetApp()
 
 	_, obj.Entities = getAllEntities()
@@ -102,7 +100,7 @@ func main() {
 		defer output.Close()
 		obj.Object = e
 
-		output, err = os.Create(config.ApplicationPath + "/" + e.Name + ".go")
+		output, err = os.Create(config.ApplicationPath + "/" + strings.ToLower(e.Name) + ".go")
 		if err != nil {
 			log.Fatalf("File creation: %s", err)
 		}
@@ -115,10 +113,30 @@ func main() {
 		fmt.Println(output.Name())
 	}
 
-	// Rendering the view components
+	// Copy the view components
 	err = copyFile("template/base.html", config.ApplicationPath+"/view/base.html")
 	if err != nil {
 		log.Fatalf("Copy of base: %s", err)
+	}
+	err = copyFile("template/dashboard.html", config.ApplicationPath+"/view/dashboard.html")
+	if err != nil {
+		log.Fatalf("Copy of dashboard: %s", err)
+	}
+	err = copyFile("template/copy/_footer.html", config.ApplicationPath+"/view/_footer.html")
+	if err != nil {
+		log.Fatalf("Copy of _footer: %s", err)
+	}
+	err = copyFile("template/copy/_header.html", config.ApplicationPath+"/view/_header.html")
+	if err != nil {
+		log.Fatalf("Copy of _header: %s", err)
+	}
+	err = copyFile("template/copy/_hero.html", config.ApplicationPath+"/view/_hero.html")
+	if err != nil {
+		log.Fatalf("Copy of _hero: %s", err)
+	}
+	err = copyFile("template/copy/_mainnav.html", config.ApplicationPath+"/view/_mainnav.html")
+	if err != nil {
+		log.Fatalf("Copy of _mainnav: %s", err)
 	}
 
 	// Rendering the sidenav
@@ -142,7 +160,7 @@ func main() {
 	// 		listtmpl, _ := template.New("list").Funcs(funcMap).ParseFiles("template/base.html", "template/list.html")
 
 	// Rendering the listview components
-	listtmpl, _ := template.New("content").Funcs(funcMap).ParseFiles("template/list.html")
+	listtmpl, _ := template.New("list").Funcs(funcMap).ParseFiles("template/list.html")
 	if err != nil {
 		log.Fatalf("Parse list template: %s", err)
 	}
@@ -152,7 +170,24 @@ func main() {
 
 		output, _ = os.Create(config.ApplicationPath + "/view/" + strings.ToLower(e.Name) + "list.html")
 
-		err = listtmpl.ExecuteTemplate(output, "content", e)
+		err = listtmpl.ExecuteTemplate(output, "list", e)
+		if err != nil {
+			log.Fatalf("template execution: %s", err)
+		}
+	}
+
+	// Rendering the detailview components
+	detailtmpl, _ := template.New("detail").Funcs(funcMap).ParseFiles("template/detail.html")
+	if err != nil {
+		log.Fatalf("Parse detail template: %s", err)
+	}
+	for _, e := range obj.Entities {
+		var output *os.File
+		defer output.Close()
+
+		output, _ = os.Create(config.ApplicationPath + "/view/" + strings.ToLower(e.Name) + "detail.html")
+
+		err = detailtmpl.ExecuteTemplate(output, "detail", e)
 		if err != nil {
 			log.Fatalf("template execution: %s", err)
 		}

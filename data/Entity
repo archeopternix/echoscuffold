@@ -1,5 +1,7 @@
 [
 	{
+		"id": 3,
+		"name": "Entry",
 		"fields": [
 			{
 				"name": "Name",
@@ -7,17 +9,25 @@
 				"type": 1
 			},
 			{
-				"name": "Users",
-				"object": "User",
+				"name": "Number",
+				"object": "",
+				"type": 2
+			},			{
+				"name": "Required",
+				"object": "",
+				"type": 3
+			},
+			{
+				"name": "Entrytype",
+				"object": "Entrytype",
 				"type": 4
 			}
-		],
-		"id": 3,
-		"name": "Role"
+		]
+
 	},
 	{
 		"id": 4,
-		"name": "User",
+		"name": "Entrytype",
 		"fields": [
 			{
 				"name": "Name",
@@ -25,8 +35,8 @@
 				"object": ""
 			},
 			{
-				"name": "Email",
-				"type": 1,
+				"name": "Value",
+				"type": 2,
 				"object": ""
 			}
 		]

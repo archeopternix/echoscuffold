@@ -1,0 +1,6 @@
+inputtype= "text","number","email","tel","url","range","password"
+binarytype="checkbox","radio"
+datetype= "date","datetime-local","month", "time", "week"
+dropdown= "search", "select"
+
+

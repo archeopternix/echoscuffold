@@ -16,8 +16,21 @@
 				"object": "",
 				"type": 2,				
 				"size": 40,
+				"step": 1,
+				"Min": 2,
+				"Max": 4,
 				"required": false
-			},			{
+			},			
+			{
+				"name": "Float",
+				"object": "",
+				"type": 2,				
+				"size": 2,
+				"Min": -5,
+				"Max": 10,
+				"required": false
+			},			
+			{
 				"name": "Required",
 				"object": "",
 				"type": 3,

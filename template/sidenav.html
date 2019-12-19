@@ -17,7 +17,7 @@
                         <li><a href="/{{.Name | plural | lowercase}}">{{.Name}}</a>
                           <ul>
                               <li><a href="/{{.Name | plural | lowercase}}">{{plural .Name}}</a></li>
-                              <li><a href="/{{.Name | plural | lowercase}}/0">Add {{.Name}}</a></li>
+                              <li><a href="/{{.Name | plural | lowercase}}/new">Add {{.Name}}</a></li>
                           </ul>
                         </li>
                     {{end}}

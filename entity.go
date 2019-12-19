@@ -21,6 +21,9 @@ type Field struct {
 	Maxlength int    `json:"maxlength,omitempty"`
 	Size      int    `json:"size,omitempty"`
 	Required  bool   `json:"required"`
+	Step      int    `json:"step,omitempty"` //for Number fields
+	Min       int    `json:"min,omitempty"`  //for Number fields
+	Max       int    `json:"max,omitempty"`  //for Number fields
 }
 
 const (

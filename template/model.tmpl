@@ -50,7 +50,9 @@ func list{{plural .Name}}(c echo.Context) error {
 	if err != nil {
 		panic(err)
 	}
-	return c.Render(http.StatusOK, "{{lowercase .Name}}list", {{.Name | plural | lowercase}})
+	p:=NewPage("{{.Name | plural}}")
+	p.Data = {{.Name | plural | lowercase}}
+	return c.Render(http.StatusOK, "{{lowercase .Name}}list", p)
 }
 
 // get handler
@@ -61,14 +63,20 @@ func get{{.Name}}(c echo.Context) error {
 	if err != nil {
 		panic(err)
 	}
+	p:=NewPage("Edit {{.Name}}")
+	p.Data = {{lowercase .Name}}
 
-	return c.Render(http.StatusOK, "{{lowercase .Name}}detail", {{lowercase .Name}})
+	return c.Render(http.StatusOK, "{{lowercase .Name}}detail", p)
 }
 
 // new handler
 func new{{.Name}}(c echo.Context) error {
 	{{lowercase .Name}} := new({{.Name}})
-	return c.Render(http.StatusOK, "{{lowercase .Name}}detail", {{lowercase .Name}})
+	
+	p:=NewPage("New {{.Name}}")
+	p.Data = {{lowercase .Name}}
+
+	return c.Render(http.StatusOK, "{{lowercase .Name}}detail", p)
 }
 
 // create handler
@@ -87,7 +95,9 @@ func create{{.Name}}(c echo.Context) (err error) {
 	if err != nil {
 		panic(err)
 	}
-	return c.Render(http.StatusOK, "{{lowercase .Name}}list", {{.Name | plural | lowercase}})
+	p:=NewPage("{{.Name | plural}}")
+	p.Data = {{.Name | plural | lowercase}}
+	return c.Render(http.StatusOK, "{{lowercase .Name}}list", p)
 }
 
 // update handler
@@ -107,7 +117,10 @@ func update{{.Name}}(c echo.Context) (err error) {
 	if err != nil {
 		panic(err)
 	}
-	return c.Render(http.StatusOK, "{{lowercase .Name}}list", {{.Name | plural | lowercase}})
+	p:=NewPage("{{.Name | plural}}")
+	p.Data = {{.Name | plural | lowercase}}
+	
+	return c.Render(http.StatusOK, "{{lowercase .Name}}list", p)
 }
 
 // delete handler
@@ -130,6 +143,9 @@ func delete{{.Name}}(c echo.Context) error {
 		panic(err)
 	}
 
-	return c.Render(http.StatusOK, "{{lowercase .Name}}list", {{.Name | plural | lowercase}})
+	p:=NewPage("{{.Name | plural}}")
+	p.Data = {{.Name | plural | lowercase}}
+	
+	return c.Render(http.StatusOK, "{{lowercase .Name}}list", p)
 }
 {{end}}

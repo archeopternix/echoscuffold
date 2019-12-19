@@ -1,7 +1,8 @@
 {{define "list" -}}
 {{"{{"}}define "{{lowercase .Name}}list" {{"}}"}}
-{{"{{"}}template "base" {{"}}"}}
+{{"{{"}}template "base" .{{"}}"}}
 <!-- Time: {{.TimeStamp}} -->
+{{"{{"}}with .Data{{"}}"}}
                        <div class="card events-card">      
                             <div class="card-table">
                                 <div class="content">
@@ -32,7 +33,8 @@
                             <footer class="card-footer">
                                 <a class="button is-primary" href="/{{.Name | plural | lowercase}}/new" >New</a>        
                              </footer>                           
-                        </div>    
-{{"{{"}}template "_footer" {{"}}"}}
+                        </div>  
+{{"{{- end}}"}}  
+{{"{{"}}template "_footer" .{{"}}"}}
 {{"{{"}}end{{"}}"}}         
 {{end}}

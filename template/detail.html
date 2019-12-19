@@ -8,12 +8,7 @@
                             <div class="card-table">
                               <div class="content">
                                 {{range .Fields}}
-                                <div class="field">
-                                  <label class="label">{{.Name}}</label>
-                                  <div class="control">
-                                    <input class="input" type="text" placeholder="Text input" name="{{.Name | lowercase}}" id="{{.Name | lowercase}}" value="{{"{{"}}.{{.Name}}{{"}}"}}">
-                                  </div>
-                                </div>
+                                {{template "fieldtypes" .}}
                                 {{end -}}
                               </div>
                             </div>                      
@@ -36,35 +31,35 @@
 
 {{define "fieldtypes"}}
 {{- if eq .Type 1}}               <div class="field">
-                                    <label class="label">{{.Name}}</label>
+                                    <label class="label">{{.Name}} {{with .Required}}*{{end}}</label>
                                     <div class="control">
-                                      <input class="input" type="text" placeholder="Text input" name="{{.Name | lowercase}}" id="{{.Name | lowercase}}" value="{{"{{.Name}}"}}">
+                                      <input class="input" type="text" placeholder="Text input" name="{{.Name | lowercase}}" id="{{.Name | lowercase}}" {{if gt .Maxlength 0}}maxlength="{{.Maxlength}}"{{end}} {{if gt .Size 0}}size="{{.Size}}"{{end}} value="{{"{{"}}.{{.Name}}{{"}}"}}" {{with .Required}}required{{end}}>
                                     </div>
                                   </div>{{end}}
 {{- if eq .Type 2}}               <div class="field">
-                                    <label class="label">{{.Name}}</label>
+                                    <label class="label">{{.Name}} {{with .Required}}*{{end}}</label>
                                     <div class="control">
-                                      <input class="input" type="number" step="1" placeholder="Integer input" name="{{.Name | lowercase}}" id="{{.Name | lowercase}}" value="{{"{{.Name}}"}}">
+                                      <input class="input" type="number" step="1" placeholder="Integer input" name="{{.Name | lowercase}}" id="{{.Name | lowercase}}" {{if gt .Maxlength 0}}maxlength="{{.Maxlength}}"{{end}} {{if gt .Size 0}}size="{{.Size}}"{{end}} value="{{"{{"}}.{{.Name}}{{"}}"}}" {{with .Required}}required{{end}}>
                                     </div>
                                   </div>{{end}}
 {{- if eq .Type 3}}               <div class="field">
                                     <div class="control">
                                       <label class="radio">
-                                        <input type="radio" name="{{.Name | lowercase}}" id="{{.Name | lowercase}}">
+                                        <input type="radio" name="{{.Name | lowercase}}" id="{{.Name | lowercase}}" value="true" {{"{{"}}if eq .{{.Name}} true{{"}}"}}checked="{{"{{"}}.{{.Name}}{{"}}"}} {{"{{"}}end{{"}}"}}">
                                         Yes
                                       </label>
                                       <label class="radio">
-                                        <input type="radio" name="{{.Name | lowercase}}" id="{{.Name | lowercase}}">
+                                        <input type="radio" name="{{.Name | lowercase}}" id="{{.Name | lowercase}}" value="false" {{"{{"}}if ne .{{.Name}} true{{"}}"}}checked="{{"{{"}}.{{.Name}}{{"}}"}} {{"{{"}}end{{"}}"}}">
                                         No
                                       </label>
                                     </div>
                                   </div>{{end}}
 {{- if eq .Type 4}}               <div class="field">
-                                    <label class="label">{{.Name}}</label>
+                                    <label class="label">{{.Name}} {{with .Required}}*{{end}}</label>
                                     <div class="control">
                                       <div class="select">
-                                        <select name="{{.Name | lowercase}}" id="{{.Name | lowercase}}" value="{{"{{.Name}}"}}">
-                                         {{"{{"}}range {{.Name}}{{"}}"}}
+                                        <select name="{{.Name | lowercase}}" id="{{.Name | lowercase}}" value="{{"{{"}}.{{.Name}}{{"}}"}}" {{with .Required}}required{{end}}>
+                                         {{"{{"}}range .{{.Name}}{{"}}"}}
                                           <option>{{"{{.}}"}}</option>
                                         {{"{{end}}"}}
                                         </select>

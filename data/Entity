@@ -6,21 +6,28 @@
 			{
 				"name": "Name",
 				"object": "",
-				"type": 1
+				"type": 1,
+				"required": true,
+				"maxlength":40,
+				"size": 40
 			},
 			{
 				"name": "Number",
 				"object": "",
-				"type": 2
+				"type": 2,				
+				"size": 40,
+				"required": false
 			},			{
 				"name": "Required",
 				"object": "",
-				"type": 3
+				"type": 3,
+				"required": false
 			},
 			{
-				"name": "Entrytype",
+				"name": "Entrytypes",
 				"object": "Entrytype",
-				"type": 4
+				"type": 4,
+				"required": false
 			}
 		]
 

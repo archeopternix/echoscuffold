@@ -81,7 +81,7 @@ var config Config
 func main() {
 	var err error
 	var obj ObjectModel
-	config.ApplicationPath = "/Users/Andreas Eisner/go/src/test"
+	config.ApplicationPath = "/Users/A.Eisner/go/src/Test"
 	config.CreateTargetApp()
 
 	_, obj.Entities = getAllEntities()

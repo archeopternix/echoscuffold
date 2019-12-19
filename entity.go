@@ -15,9 +15,12 @@ type Entity struct {
 // Field is each and every single attribute.
 // Object is empty except in case type=slicetype keeps the name of the Object
 type Field struct {
-	Name   string `json:"name"`
-	Type   int    `json:"type"`
-	Object string `json:"object"`
+	Name      string `json:"name"`
+	Type      int    `json:"type"`
+	Object    string `json:"object,omitempty"`
+	Maxlength int    `json:"maxlength,omitempty"`
+	Size      int    `json:"size,omitempty"`
+	Required  bool   `json:"required"`
 }
 
 const (

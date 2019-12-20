@@ -41,7 +41,7 @@ func get{{.Name}}ById(id string) (err error, entity {{.Name}}) {
 
 // Access lookup entries
 {{$name := .Name}}
-{{range $i, $field := .Fields}}{{if eq $field.Type 4}}
+{{range $i, $field := .Fields}}{{if eq $field.Type "lookup"}}
 func (obj {{$name}}) Lookup{{$field.Object}}() ([]{{$field.Object}}) {
 	err, {{$field.Object | lowercase}} := getAll{{$field.Object | plural}}()
 	if err != nil {

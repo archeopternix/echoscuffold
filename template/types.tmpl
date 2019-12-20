@@ -1,6 +1,8 @@
 {{define "types"}}
-{{- if eq .Type 1}}string{{end}}
-{{- if eq .Type 2}}int{{end}}
-{{- if eq .Type 3}}bool{{end}}
-{{- if eq .Type 4}}string{{end}}
+{{- if eq .Type "string"}}string{{end}}
+{{- if eq .Type "int"}}int{{end}}
+{{- if eq .Type "bool"}}bool{{end}}
+{{- if eq .Type "lookup"}}string{{end}}
+{{- if eq .Type "email"}}string{{end}}
+{{- if eq .Type "tel"}}string{{end}}
 {{- end}}

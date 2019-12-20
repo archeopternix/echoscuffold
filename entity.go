@@ -17,7 +17,7 @@ type Entity struct {
 // Object is empty except in case type=slicetype keeps the name of the Object
 type Field struct {
 	Name      string `json:"name"`
-	Type      int    `json:"type"`
+	Type      string `json:"type"` // string, int, bool, lookup
 	Object    string `json:"object,omitempty"`
 	Maxlength int    `json:"maxlength,omitempty"`
 	Size      int    `json:"size,omitempty"`
@@ -26,13 +26,6 @@ type Field struct {
 	Min       int    `json:"min,omitempty"`  //for Number fields
 	Max       int    `json:"max,omitempty"`  //for Number fields
 }
-
-const (
-	stringtype int = iota + 1
-	inttype
-	booltype
-	slicetype
-)
 
 func NewEntity() (e *Entity) {
 	id := NextId("Entity")

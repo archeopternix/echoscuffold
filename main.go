@@ -82,12 +82,12 @@ func identifyLookups(list []Entity) []Entity {
 	_, es := getAllEntities()
 	for _, entity := range es {
 		for _, field := range entity.Fields {
-			if field.Type == 4 {
+			if field.Type == "lookup" {
 				lk := NewEntity()
 				lk.Name = field.Object
 				lk.EntityType = 1
-				lk.addField(Field{Name: "Text", Required: true, Type: 1})
-				lk.addField(Field{Name: "Order", Type: 2})
+				lk.addField(Field{Name: "Text", Required: true, Type: "string"})
+				lk.addField(Field{Name: "Order", Type: "int"})
 				list = append(list, *lk)
 			}
 		}

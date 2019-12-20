@@ -12,6 +12,7 @@
                                         <th>Id</th>	
                                         {{range .Fields}}<th>{{.Name}}</th>
                                         {{end -}}
+                                        <th>Actions</th>	
                                       </tr>
                                     </thead>
                                         <tbody>
@@ -21,20 +22,39 @@
                                             {{range .Fields}}<td>{{"{{ ."}}{{.Name}} {{"}}"}}</td>	
                                             {{end -}}
                                             <td><form method="post" action="/{{.Name | plural | lowercase}}/{{"{{.Id}}"}}/delete" name="{{"{{.Id}}"}}">
-                                              <button class="button is-primary">Delete</button>
-                                              </form>  </td>                                          
-                                              <td><a class="button is-link" href="/{{.Name | plural | lowercase}}/{{"{{.Id}}"}}">Edit</a></td>
+                                            <div class="buttons">
+                                              <button class="button is-secondary">    
+                                                <span class="icon">
+                                                  <i class="far fa-trash-alt"></i>
+                                                </span>
+                                                <span>Delete</span>
+                                              </button>
+                                              <button class="button is-primary" formmethod="get" formaction="/{{.Name | plural | lowercase}}/{{"{{.Id}}"}}">
+                                                <span class="icon">                                                                                                  
+                                                  <i class="far fa-edit"></i>
+                                                </span>
+                                                <span>Edit</span>
+                                              </button>
+                                            </div>
+                                            </form>  </td>  
                                           </tr>
                                           {{"{{end}}"}}
                                         </tbody>
                                     </table>
                                 </div>
                             </div>
-                            <footer class="card-footer">
-                                <a class="button is-primary" href="/{{.Name | plural | lowercase}}/new" >New</a>        
+                            <div>
+                            </div>
+{{"{{- end}}"}}                              <footer class="card-footer">
+                              <a class="button is-link" href="/{{.Name | plural | lowercase}}/new">
+                                <span class="icon">                                                                                                  
+                                  <i class="fas fa-plus"></i>
+                                </span>
+                                <span>New</span>
+                              </a>      
                              </footer>                           
                         </div>  
-{{"{{- end}}"}}  
+
 {{"{{"}}template "_footer" .{{"}}"}}
 {{"{{"}}end{{"}}"}}         
 {{end}}

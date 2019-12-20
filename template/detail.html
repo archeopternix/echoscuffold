@@ -32,19 +32,37 @@
 {{end}}
 
 {{define "fieldtypes"}}
-{{- if eq .Type 1}}            <div class="field">
+{{- if eq .Type "string"}}            <div class="field">
                                   <label class="label">{{.Name}} {{with .Required}}*{{end}}</label>
                                   <div class="control">
                                     <input class="input" type="text" placeholder="Text input" name="{{.Name | lowercase}}" id="{{.Name | lowercase}}" {{if gt .Maxlength 0}}maxlength="{{.Maxlength}}"{{end}} {{if gt .Size 0}}size="{{.Size}}"{{end}} value="{{"{{"}}.{{.Name}}{{"}}"}}" {{with .Required}}required{{end}}>
                                   </div>
                                 </div>{{end}}
-{{- if eq .Type 2}}             <div class="field">
+{{- if eq .Type "email"}}            <div class="field">
+                                  <label class="label">{{.Name}} {{with .Required}}*{{end}}</label>
+                                  <div class="control has-icons-left">
+                                    <input class="input" type="email" placeholder="Email" name="{{.Name | lowercase}}" id="{{.Name | lowercase}}" {{if gt .Maxlength 0}}maxlength="{{.Maxlength}}"{{end}} {{if gt .Size 0}}size="{{.Size}}"{{end}} value="{{"{{"}}.{{.Name}}{{"}}"}}" {{with .Required}}required{{end}}>
+                                  <span class="icon is-small is-left">
+                                    <i class="fas fa-envelope"></i>
+                                  </span>
+                                  </div>
+                                </div>{{end}}
+{{- if eq .Type "tel"}}            <div class="field">
+                                  <label class="label">{{.Name}} {{with .Required}}*{{end}}</label>
+                                  <div class="control has-icons-left">
+                                    <input class="input" type="tel" placeholder="+49" name="{{.Name | lowercase}}" id="{{.Name | lowercase}}" value="{{"{{"}}.{{.Name}}{{"}}"}}" {{with .Required}}required{{end}}>
+                                    <span class="icon is-small is-left">
+                                      <i class="fas fa-phone"></i>
+                                    </span>
+                                  </div>
+                                </div>{{end}}
+{{- if eq .Type "int"}}             <div class="field">
                                   <label class="label">{{.Name}} {{with .Required}}*{{end}}</label>
                                   <div class="control">
                                     <input class="input" type="number" {{if gt .Step 0}}step="{{.Step}}"{{end}}  {{if gt .Min 0}}min="{{.Min}}"{{end}} {{if gt .Max 0}}max="{{.Max}}"{{end}} placeholder="Number input" name="{{.Name | lowercase}}" id="{{.Name | lowercase}}" {{if gt .Maxlength 0}}maxlength="{{.Maxlength}}"{{end}} {{if gt .Size 0}}size="{{.Size}}"{{end}} value="{{"{{"}}.{{.Name}}{{"}}"}}" {{with .Required}}required{{end}}>
                                   </div>
                                 </div>{{end}}
-{{- if eq .Type 3}}             <div class="field">
+{{- if eq .Type "bool"}}             <div class="field">
                                   <label class="label">{{.Name}} {{with .Required}}*{{end}}</label>
                                   <div class="control">
                                     <label class="radio">
@@ -57,7 +75,7 @@
                                     </label>
                                   </div>
                                 </div>{{end}}
-{{- if eq .Type 4}}             <div class="field">
+{{- if eq .Type "lookup"}}             <div class="field">
                                   <label class="label">{{.Name}} {{with .Required}}*{{end}}</label>
                                   <div class="control">
                                     <div class="select">

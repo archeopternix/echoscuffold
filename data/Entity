@@ -6,7 +6,7 @@
 			{
 				"name": "Name",
 				"object": "",
-				"type": 1,
+				"type": "string",
 				"required": true,
 				"maxlength":40,
 				"size": 40
@@ -14,7 +14,7 @@
 			{
 				"name": "Number",
 				"object": "",
-				"type": 2,				
+				"type": "int",				
 				"size": 40,
 				"step": 1,
 				"Min": 2,
@@ -22,24 +22,21 @@
 				"required": false
 			},			
 			{
-				"name": "Float",
+				"name": "Email",
 				"object": "",
-				"type": 2,				
-				"size": 2,
-				"Min": -5,
-				"Max": 10,
+				"type": "email",				
 				"required": false
 			},			
 			{
 				"name": "Required",
 				"object": "",
-				"type": 3,
+				"type": "bool",
 				"required": false
 			},
 			{
 				"name": "Fieldtype",
 				"object": "LkField",
-				"type": 4,
+				"type": "lookup",
 				"required": false
 			}
 		]
@@ -51,13 +48,14 @@
 		"fields": [
 			{
 				"name": "Name",
-				"type": 1,
+				"type": "string",
 				"object": ""
 			},
 			{
-				"name": "Value",
-				"type": 2,
-				"object": ""
+				"name": "Phone",
+				"type": "tel",
+				"object": "",
+				"required": true
 			}
 		]
 	}

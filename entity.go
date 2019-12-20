@@ -17,7 +17,7 @@ type Entity struct {
 // Object is empty except in case type=slicetype keeps the name of the Object
 type Field struct {
 	Name      string `json:"name"`
-	Type      string `json:"type"` // string, int, bool, lookup
+	Type      string `json:"type"` // string, int, bool, lookup, tel, email
 	Object    string `json:"object,omitempty"`
 	Maxlength int    `json:"maxlength,omitempty"`
 	Size      int    `json:"size,omitempty"`

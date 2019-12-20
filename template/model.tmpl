@@ -11,7 +11,7 @@ import (
 
 type {{.Name}} struct {
 	Id     string     `json:"id"`
-{{range .Fields}}	{{.Name}}	{{template "types" .}}	`json:"{{lowercase .Name}}	 {{- with .Object}}	// Lookup: {{.}}{{end}}"`
+{{range .Fields}}	{{.Name}}	{{template "types" .}}	`json:"{{lowercase .Name}}"`	 {{- with .Object}}	// Lookup: {{.}}{{end}}
 {{end}}}
 
 func (obj {{.Name}}) ID() (jsonField string, value interface{}) {

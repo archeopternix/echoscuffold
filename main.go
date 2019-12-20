@@ -78,6 +78,23 @@ func copyFile(src, dst string) error {
 
 var config Config
 
+func identifyLookups(list []Entity) []Entity {
+	_, es := getAllEntities()
+	for _, entity := range es {
+		for _, field := range entity.Fields {
+			if field.Type == 4 {
+				lk := NewEntity()
+				lk.Name = field.Object
+				lk.EntityType = 1
+				lk.addField(Field{Name: "Text", Required: true, Type: 1})
+				lk.addField(Field{Name: "Order", Type: 2})
+				list = append(list, *lk)
+			}
+		}
+	}
+	return list
+}
+
 func main() {
 	var err error
 	var obj ObjectModel
@@ -85,7 +102,8 @@ func main() {
 	config.CreateTargetApp()
 
 	_, obj.Entities = getAllEntities()
-
+	obj.Entities = identifyLookups(obj.Entities)
+	fmt.Println(obj.Entities)
 	pl := pluralize.NewClient()
 
 	// First we create a FuncMap with which to register the function.

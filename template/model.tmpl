@@ -6,13 +6,12 @@ package main
 import (
 	"github.com/labstack/echo"
 	"net/http"
-	"fmt"
 	"strconv"
 )
 
 type {{.Name}} struct {
 	Id     string     `json:"id"`
-{{range .Fields}}	{{.Name}}	{{template "types" .}}{{.Object}}	`json:"{{lowercase .Name}}"`
+{{range .Fields}}	{{.Name}}	{{template "types" .}}	`json:"{{lowercase .Name}}	 {{- with .Object}}	// Lookup: {{.}}{{end}}"`
 {{end}}}
 
 func (obj {{.Name}}) ID() (jsonField string, value interface{}) {
@@ -40,6 +39,18 @@ func get{{.Name}}ById(id string) (err error, entity {{.Name}}) {
 	return err, entity
 }
 
+// Access lookup entries
+{{$name := .Name}}
+{{range $i, $field := .Fields}}{{if eq $field.Type 4}}
+func (obj {{$name}}) Lookup{{$field.Object}}() ([]{{$field.Object}}) {
+	err, {{$field.Object | lowercase}} := getAll{{$field.Object | plural}}()
+	if err != nil {
+		panic(err)
+	}
+	return  {{$field.Object | lowercase}}
+}
+{{- end}}{{end}}
+
 // -------------------------------
 // Handlers
 // -------------------------------
@@ -64,7 +75,7 @@ func get{{.Name}}(c echo.Context) error {
 		panic(err)
 	}
 	p:=NewPage("Edit {{.Name}}")
-	p.Data = {{lowercase .Name}}
+	p.Data = {{lowercase .Name}}	
 
 	return c.Render(http.StatusOK, "{{lowercase .Name}}detail", p)
 }
@@ -81,7 +92,6 @@ func new{{.Name}}(c echo.Context) error {
 
 // create handler
 func create{{.Name}}(c echo.Context) (err error) {
-	fmt.Println("create")
 	{{lowercase .Name}} := new({{.Name}})
   	if err = c.Bind({{lowercase .Name}}); err != nil {
   	  panic(err)
@@ -91,18 +101,12 @@ func create{{.Name}}(c echo.Context) (err error) {
 	if err != nil {
 		panic(err)
 	}
-	err, {{.Name | plural | lowercase}} := getAll{{plural .Name}}()
-	if err != nil {
-		panic(err)
-	}
-	p:=NewPage("{{.Name | plural}}")
-	p.Data = {{.Name | plural | lowercase}}
-	return c.Render(http.StatusOK, "{{lowercase .Name}}list", p)
+	
+	return list{{plural .Name}}(c)
 }
 
 // update handler
 func update{{.Name}}(c echo.Context) (err error) {
-	fmt.Println("update")
 	{{lowercase .Name}} := new({{.Name}})
   	if err = c.Bind({{lowercase .Name}}); err != nil {
   	  return
@@ -113,22 +117,12 @@ func update{{.Name}}(c echo.Context) (err error) {
 		panic(err)
 	}
 
-	err, {{.Name | plural | lowercase}} := getAll{{plural .Name}}()
-	if err != nil {
-		panic(err)
-	}
-	p:=NewPage("{{.Name | plural}}")
-	p.Data = {{.Name | plural | lowercase}}
-	
-	return c.Render(http.StatusOK, "{{lowercase .Name}}list", p)
+	return list{{plural .Name}}(c)
 }
 
 // delete handler
 func delete{{.Name}}(c echo.Context) error {
-	var {{.Name | plural | lowercase }} []{{.Name}}
-
 	id := c.Param("id")
-
 	err, {{lowercase .Name}} := get{{.Name}}ById(id)
 	if err != nil {
 		panic(err)
@@ -138,14 +132,6 @@ func delete{{.Name}}(c echo.Context) error {
 		panic(err)
 	}
 	
-	err, {{.Name | plural | lowercase }} = getAll{{plural .Name}}()
-		if err != nil {
-		panic(err)
-	}
-
-	p:=NewPage("{{.Name | plural}}")
-	p.Data = {{.Name | plural | lowercase}}
-	
-	return c.Render(http.StatusOK, "{{lowercase .Name}}list", p)
+	return list{{plural .Name}}(c)
 }
 {{end}}

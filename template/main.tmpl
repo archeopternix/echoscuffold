@@ -16,17 +16,12 @@ var driver *db.Driver
 type Page struct {
 	Title   string
 	Data    interface{}
-	Lookups LookupMap
 }
 
 func NewPage(title string) *Page {
 	p := &Page{Title: title}
-	p.Lookups = make(map[string]KeyValueMap)
 	return p
 }
-
-type KeyValueMap map[int]string
-type LookupMap map[string]KeyValueMap
 
 type Template struct {
 	templates *template.Template
@@ -68,7 +63,7 @@ func main() {
 	{{end}}
 	
 	// Start server
-	e.Logger.Fatal(e.Start(":80"))
+	e.Logger.Fatal(e.Start(":8080"))
 }
 {{end}}
 

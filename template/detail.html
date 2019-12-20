@@ -62,8 +62,8 @@
                                   <div class="control">
                                     <div class="select">
                                       <select name="{{.Name | lowercase}}" id="{{.Name | lowercase}}" value="{{"{{"}}.{{.Name}}{{"}}"}}" {{with .Required}}required{{end}}>
-                                       {{"{{"}}range .{{.Name}}{{"}}"}}
-                                        <option>{{"{{.}}"}}</option>
+                                       {{"{{"}}range .Lookup{{.Object}}{{"}}"}}
+                                        <option value="{{"{{.Text}}"}}">{{"{{.Text}}"}}</option>
                                       {{"{{end}}"}}
                                       </select>
                                     </div>

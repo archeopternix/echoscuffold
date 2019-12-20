@@ -7,9 +7,10 @@ import (
 
 // Entity relates to an 'Object' or struct
 type Entity struct {
-	Id     int     `json:"id"`
-	Name   string  `json:"name"`
-	Fields []Field `json:"fields"`
+	Id         int     `json:"id"`
+	Name       string  `json:"name"`
+	Fields     []Field `json:"fields"`
+	EntityType int     `json:"type,omitempty"` // 0..Normal, 1..Lookup
 }
 
 // Field is each and every single attribute.

@@ -37,8 +37,8 @@
 				"required": false
 			},
 			{
-				"name": "Entrytypes",
-				"object": "Entrytype",
+				"name": "Fieldtype",
+				"object": "LkField",
 				"type": 4,
 				"required": false
 			}

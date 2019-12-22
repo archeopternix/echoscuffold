@@ -38,6 +38,12 @@
                                     <input class="input" type="text" placeholder="Text input" name="{{.Name | lowercase}}" id="{{.Name | lowercase}}" {{if gt .Maxlength 0}}maxlength="{{.Maxlength}}"{{end}} {{if gt .Size 0}}size="{{.Size}}"{{end}} value="{{"{{"}}.{{.Name}}{{"}}"}}" {{with .Required}}required{{end}}>
                                   </div>
                                 </div>{{end}}
+{{- if eq .Type "text"}}            <div class="field">
+                                  <label class="label">{{.Name}} {{with .Required}}*{{end}}</label>
+                                  <div class="control">
+                                    <textarea class="textarea" placeholder="Text input" name="{{.Name | lowercase}}" id="{{.Name | lowercase}}" {{if gt .Maxlength 0}}maxlength="{{.Maxlength}}"{{end}} {{if gt .Rows 0}}rows="{{.Rows}}"{{end}} {{if gt .Size 0}}cols="{{.Size}}"{{end}} value="{{"{{"}}.{{.Name}}{{"}}"}}" {{with .Required}}required{{end}}></textarea>
+                                  </div>
+                                </div>{{end}}
 {{- if eq .Type "email"}}            <div class="field">
                                   <label class="label">{{.Name}} {{with .Required}}*{{end}}</label>
                                   <div class="control has-icons-left">

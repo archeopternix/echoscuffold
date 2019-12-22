@@ -2,25 +2,35 @@
 {{"{{"}}define "sidenav" {{"}}"}}
 <!-- Time: {{.Object.TimeStamp}} -->
                 <aside class="menu is-hidden-mobile">
-                    <p class="menu-label">
-                        General
-                    </p>
+                  <p class="menu-label">
+                      General
+                  </p>
                     <ul class="menu-list">
                         <li><a class="is-active" href="/">Dashboard</a></li>
                         <li><a>Other</a></li>
                     </ul>
-                    <p class="menu-label">
-                        Administration
-                    </p>
+                  <p class="menu-label">
+                      Administration
+                  </p>
                     <ul class="menu-list">
+                    <li><a>Masterdata</a>
                     {{range .Entities}}
-                        <li><a href="/{{.Name | plural | lowercase}}">{{.Name}}</a>
+                    {{- if eq .EntityType 0}}                       
                           <ul>
                               <li><a href="/{{.Name | plural | lowercase}}">{{plural .Name}}</a></li>
-                              <li><a href="/{{.Name | plural | lowercase}}/new">Add {{.Name}}</a></li>
                           </ul>
-                        </li>
-                    {{end}}
+                     {{- end}}
+                    {{- end}}
+                    </li>
+                    <li><a>Lookup's</a>
+                    {{range .Entities}}
+                    {{- if eq .EntityType 1}}
+                          <ul>
+                              <li><a href="/{{.Name | plural | lowercase}}">{{plural .Name}}</a></li>
+                          </ul>
+                    {{- end}}
+                    {{- end}}
+                      </li>
                      </ul>
                 </aside>
 {{"{{"}}end{{"}}"}}

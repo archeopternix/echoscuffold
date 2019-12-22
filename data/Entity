@@ -4,22 +4,21 @@
 		"name": "Entry",
 		"fields": [
 			{
+				"name": "Personalnumber",
+				"object": "",
+				"type": "int",				
+				"size": 20,
+				"step": 1,
+				"Min": 1,
+				"required": true
+			},
+			{
 				"name": "Name",
 				"object": "",
 				"type": "string",
 				"required": true,
 				"maxlength":40,
 				"size": 40
-			},
-			{
-				"name": "Number",
-				"object": "",
-				"type": "int",				
-				"size": 40,
-				"step": 1,
-				"Min": 2,
-				"Max": 4,
-				"required": false
 			},			
 			{
 				"name": "Email",
@@ -51,6 +50,12 @@
 				"type": "string",
 				"object": ""
 			},
+			{
+				"name": "Email",
+				"object": "",
+				"type": "email",				
+				"required": true
+			},		
 			{
 				"name": "Phone",
 				"type": "tel",

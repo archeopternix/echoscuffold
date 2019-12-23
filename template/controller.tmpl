@@ -1,22 +1,100 @@
+{{define "controller" -}}
+// Generated code - do not modify it will be overwritten!!
+// Time: {{.Object.TimeStamp}}
 package controller
 
 import (
-	"net/http"
-
 	"github.com/labstack/echo"
+	"net/http"
+	"strconv"
+	. "{{.Name}}/model"
 )
 
-type Page struct {
-	Title string
-	Data  interface{}
+// -------------------------------
+// Handlers
+// -------------------------------
+{{with .Object}}
+// list handler
+func List{{plural .Name}}(c echo.Context) error {
+	err, {{.Name | plural | lowercase}} := GetAll{{plural .Name}}()
+	if err != nil {
+		panic(err)
+	}
+	p:=NewPage("{{.Name | plural}}")
+	p.Data = {{.Name | plural | lowercase}}
+	return c.Render(http.StatusOK, "{{lowercase .Name}}list", p)
 }
 
-func NewPage(title string) *Page {
-	p := &Page{Title: title}
-	return p
+// get handler
+func Get{{.Name}}(c echo.Context) error {
+	id := c.Param("id")
+
+	err, {{lowercase .Name}} := Get{{.Name}}ById(id)
+	if err != nil {
+		panic(err)
+	}
+	{{$name := .Name}}
+	{{range .Fields}}{{if eq .Type "parent"}}
+	_, {{lowercase $name}}.{{.Name | plural}} = GetAll{{.Object | plural}}By{{$name}}Id(id)
+	{{end}}{{end}}
+	p:=NewPage("Edit {{.Name}}")
+	p.Data = {{lowercase .Name}}	
+
+	return c.Render(http.StatusOK, "{{lowercase .Name}}detail", p)
 }
 
-func Dashboard(c echo.Context) error {
-	p := NewPage("Dashboard")
-	return c.Render(http.StatusOK, "dashboard", p)
+// new handler
+func New{{.Name}}(c echo.Context) error {
+	{{lowercase .Name}} := new({{.Name}})
+	
+	p:=NewPage("New {{.Name}}")
+	p.Data = {{lowercase .Name}}
+
+	return c.Render(http.StatusOK, "{{lowercase .Name}}detail", p)
 }
+
+// create handler
+func Create{{.Name}}(c echo.Context) (err error) {
+	{{lowercase .Name}} := new({{.Name}})
+  	if err = c.Bind({{lowercase .Name}}); err != nil {
+  	  panic(err)
+  	}
+	{{lowercase .Name}}.Id = strconv.Itoa(NextId({{.Name | printf "%q"}}))
+	err = Database.Insert({{lowercase .Name}})
+	if err != nil {
+		panic(err)
+	}
+	
+	return List{{plural .Name}}(c)
+}
+
+// update handler
+func Update{{.Name}}(c echo.Context) (err error) {
+	{{lowercase .Name}} := new({{.Name}})
+  	if err = c.Bind({{lowercase .Name}}); err != nil {
+  	  return
+  	}
+
+	err = Database.Update({{lowercase .Name}})
+	if err != nil {
+		panic(err)
+	}
+
+	return List{{plural .Name}}(c)
+}
+
+// delete handler
+func Delete{{.Name}}(c echo.Context) error {
+	id := c.Param("id")
+	err, {{lowercase .Name}} := Get{{.Name}}ById(id)
+	if err != nil {
+		panic(err)
+	}
+	err = Database.Delete({{lowercase .Name}})
+	if err != nil {
+		panic(err)
+	}
+	
+	return List{{plural .Name}}(c)
+}
+{{end}}{{end}}

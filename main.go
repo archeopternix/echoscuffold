@@ -20,7 +20,7 @@ type Page struct {
 }
 
 // Holds all entitites or one dedicated Object for template generation
-type ObjectModel struct {
+type AppModel struct {
 	Entities []Entity
 	Object   Entity
 	Config
@@ -28,43 +28,43 @@ type ObjectModel struct {
 
 // App configurtations
 type Config struct {
-	ApplicationPath string
-	ApplicationName string
+	Path string
+	Name string
 }
 
 // Creates standard app directories
 func (c Config) CreateTargetApp() {
-	_, err := os.Lstat(c.ApplicationPath + "/static")
+	_, err := os.Lstat(c.Path + "/static")
 	if err != nil {
-		err = os.Mkdir(c.ApplicationPath+"/static", os.ModeDir)
+		err = os.Mkdir(c.Path+"/static", os.ModeDir)
 		if err != nil {
 			log.Fatalf("Static files directory created: %s", err)
 		}
 	}
-	_, err = os.Lstat(c.ApplicationPath + "/view")
+	_, err = os.Lstat(c.Path + "/view")
 	if err != nil {
-		err = os.Mkdir(c.ApplicationPath+"/view", os.ModeDir)
+		err = os.Mkdir(c.Path+"/view", os.ModeDir)
 		if err != nil {
 			log.Fatalf("Subdir created: %s", err)
 		}
 	}
-	_, err = os.Lstat(c.ApplicationPath + "/data")
+	_, err = os.Lstat(c.Path + "/data")
 	if err != nil {
-		err = os.Mkdir(c.ApplicationPath+"/data", os.ModeDir)
+		err = os.Mkdir(c.Path+"/data", os.ModeDir)
 		if err != nil {
 			log.Fatalf("Subdir created: %s", err)
 		}
 	}
-	_, err = os.Lstat(c.ApplicationPath + "/model")
+	_, err = os.Lstat(c.Path + "/model")
 	if err != nil {
-		err = os.Mkdir(c.ApplicationPath+"/model", os.ModeDir)
+		err = os.Mkdir(c.Path+"/model", os.ModeDir)
 		if err != nil {
 			log.Fatalf("Subdir created: %s", err)
 		}
 	}
-	_, err = os.Lstat(c.ApplicationPath + "/controller")
+	_, err = os.Lstat(c.Path + "/controller")
 	if err != nil {
-		err = os.Mkdir(c.ApplicationPath+"/controller", os.ModeDir)
+		err = os.Mkdir(c.Path+"/controller", os.ModeDir)
 		if err != nil {
 			log.Fatalf("Subdir created: %s", err)
 		}
@@ -152,16 +152,16 @@ func parseRelations(list []Entity) []Entity {
 func generateModel(mt *template.Template) {
 	var err error
 
-	for _, e := range obj.Entities {
+	for _, e := range app.Entities {
 		var output *os.File
 		defer output.Close()
-		obj.Object = e
-		output, err = os.Create(obj.ApplicationPath + "/model/" + strings.ToLower(e.Name) + ".go")
+		app.Object = e
+		output, err = os.Create(app.Path + "/model/" + strings.ToLower(e.Name) + ".go")
 		if err != nil {
 			log.Fatalf("File creation: %s", err)
 		}
 
-		err = mt.ExecuteTemplate(output, "model", obj)
+		err = mt.ExecuteTemplate(output, "model", app)
 		if err != nil {
 			log.Fatalf("template execution: %s", err)
 		}
@@ -170,7 +170,7 @@ func generateModel(mt *template.Template) {
 	}
 
 	// Copy of database.go
-	err = copyFile("model/database.go", obj.ApplicationPath+"/model/database.go")
+	err = copyFile("model/database.go", app.Path+"/model/database.go")
 	if err != nil {
 		log.Fatalf("Copy of .go file: %s", err)
 	}
@@ -179,8 +179,27 @@ func generateModel(mt *template.Template) {
 
 // generate app controller and copies basic functions
 func generateController(ct *template.Template) {
-	// Copy of database.go
-	err := copyFile("template/controller.tmpl", obj.ApplicationPath+"/controller/controller.go")
+	var err error
+
+	for _, e := range app.Entities {
+		var output *os.File
+		defer output.Close()
+		app.Object = e
+		output, err = os.Create(app.Path + "/controller/" + strings.ToLower(e.Name) + ".go")
+		if err != nil {
+			log.Fatalf("File creation: %s", err)
+		}
+
+		err = ct.ExecuteTemplate(output, "controller", app)
+		if err != nil {
+			log.Fatalf("template execution: %s", err)
+		}
+
+		fmt.Println("controller generated: " + output.Name())
+	}
+
+	// Copy of dashboard.go
+	err = copyFile("template/dashboard.tmpl", app.Path+"/controller/dashboard.go")
 	if err != nil {
 		log.Fatalf("Copy of .go file: %s", err)
 	}
@@ -188,19 +207,19 @@ func generateController(ct *template.Template) {
 
 }
 
-var obj ObjectModel
+var app AppModel
 
 func main() {
 	var err error
 
-	obj.ApplicationName = "CRUD"
-	obj.ApplicationPath = "/Users/A.Eisner/go/src/" + obj.ApplicationName
-	obj.CreateTargetApp()
+	app.Name = "CRUD"
+	app.Path = "/Users/A.Eisner/go/src/" + app.Name
+	app.CreateTargetApp()
 
-	_, obj.Entities = GetAllEntities()
-	obj.Entities = identifyLookups(obj.Entities)
-	obj.Entities = parseRelations(obj.Entities)
-	fmt.Printf("%d entities loaded.\n", len(obj.Entities))
+	_, app.Entities = GetAllEntities()
+	app.Entities = identifyLookups(app.Entities)
+	app.Entities = parseRelations(app.Entities)
+	fmt.Printf("%d entities loaded.\n", len(app.Entities))
 
 	// pluralize and sigularize functions for templates
 	pl := pluralize.NewClient()
@@ -210,37 +229,42 @@ func main() {
 	}
 
 	// Rendering the model components
-	modeltmpl, err := template.New("model").Funcs(funcMap).ParseFiles("template/model.tmpl", "template/types.tmpl")
+	tmpl, err := template.New("model").Funcs(funcMap).ParseFiles("template/model.tmpl", "template/types.tmpl")
 	if err != nil {
 		log.Fatalf("Error in model templates: %s", err)
 	}
-	generateModel(modeltmpl)
+	generateModel(tmpl)
 
-	generateController(modeltmpl)
+	// Rendering the controller components
+	tmpl, err = template.New("controller").Funcs(funcMap).ParseFiles("template/controller.tmpl")
+	if err != nil {
+		log.Fatalf("Error in controller templates: %s", err)
+	}
+	generateController(tmpl)
 
 	fmt.Println("views")
 	// Copy the view components
-	err = copyFile("template/base.html", obj.ApplicationPath+"/view/base.html")
+	err = copyFile("template/base.html", app.Path+"/view/base.html")
 	if err != nil {
 		log.Fatalf("Copy of base: %s", err)
 	}
-	err = copyFile("template/dashboard.html", obj.ApplicationPath+"/view/dashboard.html")
+	err = copyFile("template/dashboard.html", app.Path+"/view/dashboard.html")
 	if err != nil {
 		log.Fatalf("Copy of dashboard: %s", err)
 	}
-	err = copyFile("template/copy/_footer.html", obj.ApplicationPath+"/view/_footer.html")
+	err = copyFile("template/copy/_footer.html", app.Path+"/view/_footer.html")
 	if err != nil {
 		log.Fatalf("Copy of _footer: %s", err)
 	}
-	err = copyFile("template/copy/_header.html", obj.ApplicationPath+"/view/_header.html")
+	err = copyFile("template/copy/_header.html", app.Path+"/view/_header.html")
 	if err != nil {
 		log.Fatalf("Copy of _header: %s", err)
 	}
-	err = copyFile("template/copy/_hero.html", obj.ApplicationPath+"/view/_hero.html")
+	err = copyFile("template/copy/_hero.html", app.Path+"/view/_hero.html")
 	if err != nil {
 		log.Fatalf("Copy of _hero: %s", err)
 	}
-	err = copyFile("template/copy/_mainnav.html", obj.ApplicationPath+"/view/_mainnav.html")
+	err = copyFile("template/copy/_mainnav.html", app.Path+"/view/_mainnav.html")
 	if err != nil {
 		log.Fatalf("Copy of _mainnav: %s", err)
 	}
@@ -253,11 +277,11 @@ func main() {
 	var output *os.File
 	defer output.Close()
 
-	output, err = os.Create(obj.ApplicationPath + "/view/sidenav.html")
+	output, err = os.Create(app.Path + "/view/sidenav.html")
 	if err != nil {
 		log.Fatalf("File creation: %s", err)
 	}
-	err = sidenavtmpl.ExecuteTemplate(output, "sidenav", obj)
+	err = sidenavtmpl.ExecuteTemplate(output, "sidenav", app)
 	if err != nil {
 		log.Fatalf("template execution: %s", err)
 	}
@@ -268,11 +292,11 @@ func main() {
 	if err != nil {
 		log.Fatalf("Parse list template: %s", err)
 	}
-	for _, e := range obj.Entities {
+	for _, e := range app.Entities {
 		var output *os.File
 		defer output.Close()
 
-		output, _ = os.Create(obj.ApplicationPath + "/view/" + strings.ToLower(e.Name) + "list.html")
+		output, _ = os.Create(app.Path + "/view/" + strings.ToLower(e.Name) + "list.html")
 
 		err = listtmpl.ExecuteTemplate(output, "list", e)
 		if err != nil {
@@ -285,11 +309,11 @@ func main() {
 	if err != nil {
 		log.Fatalf("Parse list template: %s", err)
 	}
-	for _, e := range obj.Entities {
+	for _, e := range app.Entities {
 		var output *os.File
 		defer output.Close()
 
-		output, _ = os.Create(obj.ApplicationPath + "/view/" + strings.ToLower(e.Name) + "listtable.html")
+		output, _ = os.Create(app.Path + "/view/" + strings.ToLower(e.Name) + "listtable.html")
 
 		err = listtabletmpl.ExecuteTemplate(output, "listtable", e)
 		if err != nil {
@@ -302,11 +326,11 @@ func main() {
 	if err != nil {
 		log.Fatalf("Parse detail template: %s", err)
 	}
-	for _, e := range obj.Entities {
+	for _, e := range app.Entities {
 		var output *os.File
 		defer output.Close()
 
-		output, _ = os.Create(obj.ApplicationPath + "/view/" + strings.ToLower(e.Name) + "detail.html")
+		output, _ = os.Create(app.Path + "/view/" + strings.ToLower(e.Name) + "detail.html")
 
 		err = detailtmpl.ExecuteTemplate(output, "detail", e)
 		if err != nil {
@@ -322,11 +346,11 @@ func main() {
 		log.Fatalf("Parse main.go template: %s", err)
 	}
 
-	output, err = os.Create(obj.ApplicationPath + "/main.go")
+	output, err = os.Create(app.Path + "/main.go")
 	if err != nil {
 		log.Fatalf("File creation: %s", err)
 	}
-	err = maintmpl.ExecuteTemplate(output, "main", obj)
+	err = maintmpl.ExecuteTemplate(output, "main", app)
 	if err != nil {
 		log.Fatalf("template execution: %s", err)
 	}

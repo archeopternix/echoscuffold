@@ -39,6 +39,9 @@ func dashboard(c echo.Context) error {
 func main() {
 	// Echo instance
 	e := echo.New()
+	// assets will be loaded from /static directory as /assets/*
+	e.Static("/static", "assets")
+	
 	// Instantiate a template registry with an array of template set
 	// Ref: https://gist.github.com/rand99/808e6e9702c00ce64803d94abff65678
 	renderer := &Template{

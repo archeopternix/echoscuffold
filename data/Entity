@@ -5,36 +5,24 @@
 		"fields": [
 			{
 				"name": "Personalnumber",
-				"object": "",
-				"type": "int",				
+				"type": "string",				
 				"size": 20,
-				"step": 1,
-				"Min": 1,
-				"required": true
-			},
-			{
-				"name": "Name",
-				"object": "",
-				"type": "string",
 				"required": true,
-				"maxlength":40,
-				"size": 40
-			},			
+				"islabel": true
+			},		
 			{
 				"name": "Email",
-				"object": "",
 				"type": "email",				
 				"required": false
 			},			
 			{
 				"name": "Required",
-				"object": "",
 				"type": "bool",
 				"required": false
 			},
 			{
 				"name": "Fieldtype",
-				"object": "LkField",
+				"object": "Fieldtype",
 				"type": "lookup",
 				"required": false
 			}
@@ -48,18 +36,16 @@
 			{
 				"name": "Name",
 				"type": "string",
-				"object": ""
+				"islabel": true
 			},
 			{
 				"name": "Email",
-				"object": "",
 				"type": "email",				
 				"required": true
 			},		
 			{
 				"name": "Phone",
 				"type": "tel",
-				"object": "",
 				"required": true
 			}
 		]

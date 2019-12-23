@@ -12,7 +12,8 @@
                     {{template "fieldtypes" . }}
                                 {{end -}}
                               </div>
-                            </div>                      
+                            </div>    
+                            <hr class="hr" style="margin-bottom: 0;">                  
                             <footer class="card-footer">
                               <div class="field is-grouped">
                                 <div class="control">
@@ -26,6 +27,10 @@
                            </footer>
                         </div>
                       </form>
+                      <hr class="hr" style="margin-bottom: 0;">
+                      {{- range .Fields}}{{if eq .Type "parent"}}
+                      {{"{{"}}template "{{.Object | singular | lowercase}}listtable" .{{.Object | plural}}{{"}}"}}
+                      {{- end}}{{end}}
 {{"{{- end}}"}}  
 {{"{{"}}template "_footer" .{{"}}"}}
 {{"{{"}}end{{"}}"}}         
@@ -93,4 +98,16 @@
                                     </div>
                                   </div>
                                 </div>{{end}}
+{{- if eq .Type "child"}}             <div class="field">
+                                  <label class="label">{{.Name}} {{with .Required}}*{{end}}</label>
+                                  <div class="control">
+                                    <div class="select">
+                                      <select name="{{.Name | lowercase}}id" id="{{.Name | lowercase}}id" value="{{"{{"}}.{{.Name}}Id{{"}}"}}" {{with .Required}}required{{end}}>
+                                       {{"{{"}}range .Lookup{{.Object}}{{"}}"}}
+                                        <option value="{{"{{.Id}}"}}">{{"{{.Label}}"}}</option>
+                                      {{"{{end}}"}}
+                                      </select>
+                                    </div>
+                                  </div>
+                                </div>{{end}}                                
 {{- end}}

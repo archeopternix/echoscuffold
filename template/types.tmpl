@@ -1,9 +1,13 @@
 {{define "types"}}
-{{- if eq .Type "string"}}string{{end}}
-{{- if eq .Type "int"}}int{{end}}
-{{- if eq .Type "bool"}}bool{{end}}
-{{- if eq .Type "lookup"}}string{{end}}
-{{- if eq .Type "email"}}string{{end}}
-{{- if eq .Type "tel"}}string{{end}}
-{{- if eq .Type "text"}}string{{end}}
+{{- if eq .Type "string"}}	{{.Name}}	string	`json:"{{lowercase .Name}}"`{{end}}
+{{- if eq .Type "int"}}	{{.Name}}	int	`json:"{{lowercase .Name}}"`{{end}}
+{{- if eq .Type "bool"}}	{{.Name}}	bool	`json:"{{lowercase .Name}}"`{{end}}
+{{- if eq .Type "email"}}	{{.Name}}	string	`json:"{{lowercase .Name}}"`{{end}}
+{{- if eq .Type "tel"}}	{{.Name}}	string	`json:"{{lowercase .Name}}"`{{end}}
+{{- if eq .Type "text"}}	{{.Name}}	string	`json:"{{lowercase .Name}}"`{{end}}
+{{- if eq .Type "lookup"}}	{{.Name}}	string	`json:"{{lowercase .Name}}"`	// Lookup: {{.Object}}{{end}}
+{{- if eq .Type "parent"}}	{{.Name | plural}}	[]{{.Object}}	`json:"-"`	// one2many: childs only for view (not persistet){{end}}
+{{- if eq .Type "child"}}	{{.Name}}Id	string	`json:"{{lowercase .Name}}id"`	// one2many: Id of parent object{{end}}
+{{- if eq .Type "manychild"}}	{{.Name}}Id	string	`json:"{{lowercase .Name}}id"`	// many2many: Id of parent object, mappingtable: {{.Object}}{{end}}
+{{- if eq .Type "manyparent"}}	{{.Name | plural}}	[]{{.Name}}	`json:"-"`	// many2many: childs of target, mappingtable: {{.Object}}{{end}}
 {{- end}}

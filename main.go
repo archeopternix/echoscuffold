@@ -28,15 +28,14 @@ type Config struct {
 }
 
 func (c Config) CreateTargetApp() {
-	/*_, err := os.Lstat(c.ApplicationPath + "/model")
+	_, err := os.Lstat(c.ApplicationPath + "/static")
 	if err != nil {
-		err = os.Mkdir(c.ApplicationPath+"/model", os.ModeDir)
+		err = os.Mkdir(c.ApplicationPath+"/static", os.ModeDir)
 		if err != nil {
-			log.Fatalf("Subdir created: %s", err)
+			log.Fatalf("Static files directory created: %s", err)
 		}
 	}
-	*/
-	_, err := os.Lstat(c.ApplicationPath + "/view")
+	_, err = os.Lstat(c.ApplicationPath + "/view")
 	if err != nil {
 		err = os.Mkdir(c.ApplicationPath+"/view", os.ModeDir)
 		if err != nil {
@@ -95,6 +94,43 @@ func identifyLookups(list []Entity) []Entity {
 	return list
 }
 
+func parseRelations(list []Entity) []Entity {
+	rels := getAllRelations()
+	fmt.Print("Relationen:")
+	fmt.Println(rels)
+	for _, relation := range rels {
+		if relation.Kind == "one2many" {
+			for i, entity := range list {
+				if relation.Child == entity.Name {
+					list[i].addField(Field{Name: relation.Parent, Type: "child", Object: relation.Parent})
+				}
+				if relation.Parent == entity.Name {
+					list[i].addField(Field{Name: relation.Child, Type: "parent", Object: relation.Child})
+				}
+			}
+		}
+		if relation.Kind == "many2many" {
+			lk := NewEntity()
+			lk.Name = relation.Parent + relation.Child
+			lk.EntityType = 2
+			lk.addField(Field{Name: relation.Child, Type: "manychild", Object: lk.Name})
+			lk.addField(Field{Name: relation.Parent, Type: "manychild", Object: lk.Name})
+			list = append(list, *lk)
+			for i, entity := range list {
+				if relation.Child == entity.Name {
+					list[i].addField(Field{Name: relation.Parent, Type: "manyparent", Object: lk.Name})
+				}
+				if relation.Parent == entity.Name {
+					list[i].addField(Field{Name: relation.Child, Type: "manyparent", Object: lk.Name})
+				}
+			}
+
+		}
+
+	}
+	return list
+}
+
 func main() {
 	var err error
 	var obj ObjectModel
@@ -103,7 +139,8 @@ func main() {
 
 	_, obj.Entities = getAllEntities()
 	obj.Entities = identifyLookups(obj.Entities)
-	fmt.Println(obj.Entities)
+	obj.Entities = parseRelations(obj.Entities)
+
 	pl := pluralize.NewClient()
 
 	// First we create a FuncMap with which to register the function.
@@ -111,6 +148,7 @@ func main() {
 		"lowercase": strings.ToLower, "singular": pl.Singular, "plural": pl.Plural,
 	}
 
+	fmt.Println("models")
 	// Rendering the model components
 	modeltmpl, err := template.New("model").Funcs(funcMap).ParseFiles("template/model.tmpl", "template/types.tmpl")
 	for _, e := range obj.Entities {
@@ -131,6 +169,7 @@ func main() {
 		fmt.Println(output.Name())
 	}
 
+	fmt.Println("views")
 	// Copy the view components
 	err = copyFile("template/base.html", config.ApplicationPath+"/view/base.html")
 	if err != nil {
@@ -189,6 +228,23 @@ func main() {
 		output, _ = os.Create(config.ApplicationPath + "/view/" + strings.ToLower(e.Name) + "list.html")
 
 		err = listtmpl.ExecuteTemplate(output, "list", e)
+		if err != nil {
+			log.Fatalf("template execution: %s", err)
+		}
+	}
+
+	// Rendering the listview components
+	listtabletmpl, _ := template.New("list").Funcs(funcMap).ParseFiles("template/listtable.html")
+	if err != nil {
+		log.Fatalf("Parse list template: %s", err)
+	}
+	for _, e := range obj.Entities {
+		var output *os.File
+		defer output.Close()
+
+		output, _ = os.Create(config.ApplicationPath + "/view/" + strings.ToLower(e.Name) + "listtable.html")
+
+		err = listtabletmpl.ExecuteTemplate(output, "listtable", e)
 		if err != nil {
 			log.Fatalf("template execution: %s", err)
 		}

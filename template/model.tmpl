@@ -11,14 +11,22 @@ import (
 
 type {{.Name}} struct {
 	Id     string     `json:"id"`
-{{range .Fields}}	{{.Name}}	{{template "types" .}}	`json:"{{lowercase .Name}}"`	 {{- with .Object}}	// Lookup: {{.}}{{end}}
-{{end}}}
+{{range .Fields}}{{template "types" .}}
+{{end -}}
+}
 
 func (obj {{.Name}}) ID() (jsonField string, value interface{}) {
 	value = obj.Id
 	jsonField = "id"
 	return
 }
+
+{{$name := .Name}}
+{{- range .Fields}}{{- if eq .IsLabel true}}
+func (obj {{$name}}) Label() (string) {
+	return obj.{{.Name}}
+}
+{{- end}}{{end}}
 
 // Database access functions
 // retrieve all entries for specified Object
@@ -39,9 +47,30 @@ func get{{.Name}}ById(id string) (err error, entity {{.Name}}) {
 	return err, entity
 }
 
-// Access lookup entries
 {{$name := .Name}}
-{{range $i, $field := .Fields}}{{if eq $field.Type "lookup"}}
+{{- range .Fields}}{{if eq .Type "child"}}
+// retrieve all entries with specific ParentId
+func getAll{{$name | plural}}By{{.Object}}Id(parentid string) (err error, entities []{{$name}}) {
+	err = Database.Open({{$name}}{}).Where("{{.Name | lowercase}}id", "=", parentid).Get().AsEntity(&entities)
+	if err != nil {
+		panic(err)
+	}
+	return err, entities
+}
+
+func (obj {{$name}}) LabelBy{{.Object}}Id(id string) (string){
+	var entity {{.Object}}
+	err := Database.Open({{.Object}}{}).Where("id", "=", id).First().AsEntity(&entity)
+	if err != nil {
+		panic(err)
+	}
+	return entity.Label()
+}
+{{end}}{{end}}
+
+{{$name := .Name}}
+{{range $i, $field := .Fields}}{{if eq $field.Type "lookup" "child"}}
+// Access lookup entries for {{$field.Object}}
 func (obj {{$name}}) Lookup{{$field.Object}}() ([]{{$field.Object}}) {
 	err, {{$field.Object | lowercase}} := getAll{{$field.Object | plural}}()
 	if err != nil {
@@ -74,6 +103,10 @@ func get{{.Name}}(c echo.Context) error {
 	if err != nil {
 		panic(err)
 	}
+	{{$name := .Name}}
+	{{range .Fields}}{{if eq .Type "parent"}}
+	_, {{lowercase $name}}.{{.Name | plural}} = getAll{{.Object | plural}}By{{$name}}Id(id)
+	{{end}}{{end}}
 	p:=NewPage("Edit {{.Name}}")
 	p.Data = {{lowercase .Name}}	
 
@@ -135,3 +168,5 @@ func delete{{.Name}}(c echo.Context) error {
 	return list{{plural .Name}}(c)
 }
 {{end}}
+
+

@@ -1,0 +1,58 @@
+{{define "listtable" -}}
+{{"{{"}}define "{{lowercase .Name}}listtable" {{"}}"}}
+<!-- Time: {{.TimeStamp}} -->
+                       <div class="card events-card">      
+                            <div class="card-table">
+                                <div class="content">
+                                    <table class="table is-fullwidth is-striped">
+                                     <thead>
+                                      <tr>
+                                        <th>Id</th>	
+                                        {{range .Fields -}}
+                                          {{if eq .Type "manyparent" "parent" }}{{else}}<th>{{.Name}}</th>{{- end}}
+                                        {{end -}}
+                                        <th>Actions</th>	
+                                      </tr>
+                                    </thead>
+                                        <tbody>
+                                          {{"{{"}}range .{{"}}"}}
+                                          <tr>
+                                            <td>{{"{{.Id}}"}}</td>{{$entityname := .Name}}
+                                            {{range .Fields}}{{if eq .Type "manyparent" "parent"}}{{else}}<td>{{if eq .Type "child"}}{{"{{"}}.LabelBy{{.Object}}Id .{{.Name}}Id{{"}}"}}{{else}}{{if eq .IsLabel true}}<a href="/{{$entityname | plural | lowercase}}/{{"{{.Id}}"}}">{{"{{"}}.{{.Name}}{{"}}"}}</a>{{else}}{{"{{"}}.{{.Name}}{{"}}"}}{{end}}{{end}}</td>{{end}}	
+                                            {{end -}}
+                                            <td><form method="post" action="/{{.Name | plural | lowercase}}/{{"{{.Id}}"}}/delete" name="{{"{{.Id}}"}}">
+                                            <div class="buttons">
+                                              <button class="button is-secondary">    
+                                                <span class="icon">
+                                                  <i class="far fa-trash-alt"></i>
+                                                </span>
+                                                <span>Delete</span>
+                                              </button>
+                                              <button class="button is-primary" formmethod="get" formaction="/{{.Name | plural | lowercase}}/{{"{{.Id}}"}}">
+                                                <span class="icon">                                                                                                  
+                                                  <i class="far fa-edit"></i>
+                                                </span>
+                                                <span>Edit</span>
+                                              </button>
+                                            </div>
+                                            </form>  </td>  
+                                          </tr>
+                                          {{"{{end}}"}}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div>
+                            </div>
+                            <footer class="card-footer">
+                              <a class="button is-link" href="/{{.Name | plural | lowercase}}/new">
+                                <span class="icon">                                                                                                  
+                                  <i class="fas fa-plus"></i>
+                                </span>
+                                <span>New</span>
+                              </a>      
+                             </footer>                           
+                        </div>  
+{{"{{"}}end{{"}}"}}         
+{{end}}
+

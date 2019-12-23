@@ -1,0 +1,8 @@
+[
+	{
+		"id": "1",
+		"parent": "Entry",
+		"child": "Entrytype",
+		"kind": "one2many"
+	}
+]

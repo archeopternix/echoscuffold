@@ -1,0 +1,22 @@
+package controller
+
+import (
+	"net/http"
+
+	"github.com/labstack/echo"
+)
+
+type Page struct {
+	Title string
+	Data  interface{}
+}
+
+func NewPage(title string) *Page {
+	p := &Page{Title: title}
+	return p
+}
+
+func Dashboard(c echo.Context) error {
+	p := NewPage("Dashboard")
+	return c.Render(http.StatusOK, "dashboard", p)
+}

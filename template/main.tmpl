@@ -3,25 +3,12 @@ package main
 
 import (
 	"io"
-	"net/http"
 	"text/template"
-
+	. "{{.ApplicationName}}/model"
+	. "{{.ApplicationName}}/controller"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
-	"github.com/sonyarouje/simdb/db"
 )
-
-var driver *db.Driver
-
-type Page struct {
-	Title   string
-	Data    interface{}
-}
-
-func NewPage(title string) *Page {
-	p := &Page{Title: title}
-	return p
-}
 
 type Template struct {
 	templates *template.Template
@@ -31,10 +18,6 @@ func (t *Template) Render(w io.Writer, name string, data interface{}, c echo.Con
 	return t.templates.ExecuteTemplate(w, name, data)
 }
 
-func dashboard(c echo.Context) error {
-	p:=NewPage("Dashboard")
-	return c.Render(http.StatusOK, "dashboard", p)
-}
 
 func main() {
 	// Echo instance
@@ -54,15 +37,15 @@ func main() {
 	e.Use(middleware.Recover())
 
 	// Routes
-	e.GET("/", dashboard) // Opens Dashboard
+	e.GET("/", Dashboard) // Opens Dashboard
 	{{range .Entities}}
 	// routes for {{.Name}}
-	e.GET("/{{.Name | plural | lowercase }}", list{{plural .Name}})
-	e.GET("/{{.Name | plural | lowercase }}/:id", get{{.Name}})
-	e.GET("/{{.Name | plural | lowercase }}/new", new{{.Name}})
-	e.POST("/{{.Name | plural | lowercase }}", create{{.Name}})
-	e.POST("/{{.Name | plural | lowercase }}/:id", update{{.Name}})
-	e.POST("/{{.Name | plural | lowercase }}/:id/delete", delete{{.Name}})
+	e.GET("/{{.Name | plural | lowercase }}", List{{plural .Name}})
+	e.GET("/{{.Name | plural | lowercase }}/:id", Get{{.Name}})
+	e.GET("/{{.Name | plural | lowercase }}/new", New{{.Name}})
+	e.POST("/{{.Name | plural | lowercase }}", Create{{.Name}})
+	e.POST("/{{.Name | plural | lowercase }}/:id", Update{{.Name}})
+	e.POST("/{{.Name | plural | lowercase }}/:id/delete", Delete{{.Name}})
 	{{end}}
 	
 	// Start server

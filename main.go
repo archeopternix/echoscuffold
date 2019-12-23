@@ -2,6 +2,7 @@
 package main
 
 import (
+	. "echoscuffold/model"
 	"fmt"
 	"io"
 	"log"
@@ -18,17 +19,20 @@ type Page struct {
 	Content    interface{}
 }
 
+// Holds all entitites or one dedicated Object for template generation
 type ObjectModel struct {
 	Entities []Entity
 	Object   Entity
 	Config
 }
 
+// App configurtations
 type Config struct {
 	ApplicationPath string
 	ApplicationName string
 }
 
+// Creates standard app directories
 func (c Config) CreateTargetApp() {
 	_, err := os.Lstat(c.ApplicationPath + "/static")
 	if err != nil {
@@ -67,6 +71,7 @@ func (c Config) CreateTargetApp() {
 	}
 }
 
+// copies file from "src" to "dst"
 func copyFile(src, dst string) error {
 	sourceFileStat, err := os.Stat(src)
 	if err != nil {
@@ -90,16 +95,17 @@ func copyFile(src, dst string) error {
 	return err
 }
 
+// loops through all fields for "lookup" fields and adds a lookup entity
 func identifyLookups(list []Entity) []Entity {
-	_, es := getAllEntities()
+	_, es := GetAllEntities()
 	for _, entity := range es {
 		for _, field := range entity.Fields {
 			if field.Type == "lookup" {
 				lk := NewEntity()
 				lk.Name = field.Object
 				lk.EntityType = 1
-				lk.addField(Field{Name: "Text", Required: true, Type: "string"})
-				lk.addField(Field{Name: "Order", Type: "int"})
+				lk.AddField(Field{Name: "Text", Required: true, Type: "string"})
+				lk.AddField(Field{Name: "Order", Type: "int"})
 				list = append(list, *lk)
 			}
 		}
@@ -107,18 +113,18 @@ func identifyLookups(list []Entity) []Entity {
 	return list
 }
 
+// loops through all relations and adds parent/child fields or many-to-many mappingttable
 func parseRelations(list []Entity) []Entity {
-	rels := getAllRelations()
-	fmt.Print("Relationen:")
-	fmt.Println(rels)
+	rels := GetAllRelations()
+	fmt.Printf("%d relations loaded.\n", len(rels))
 	for _, relation := range rels {
 		if relation.Kind == "one2many" {
 			for i, entity := range list {
 				if relation.Child == entity.Name {
-					list[i].addField(Field{Name: relation.Parent, Type: "child", Object: relation.Parent})
+					list[i].AddField(Field{Name: relation.Parent, Type: "child", Object: relation.Parent})
 				}
 				if relation.Parent == entity.Name {
-					list[i].addField(Field{Name: relation.Child, Type: "parent", Object: relation.Child})
+					list[i].AddField(Field{Name: relation.Child, Type: "parent", Object: relation.Child})
 				}
 			}
 		}
@@ -126,15 +132,15 @@ func parseRelations(list []Entity) []Entity {
 			lk := NewEntity()
 			lk.Name = relation.Parent + relation.Child
 			lk.EntityType = 2
-			lk.addField(Field{Name: relation.Child, Type: "manychild", Object: lk.Name})
-			lk.addField(Field{Name: relation.Parent, Type: "manychild", Object: lk.Name})
+			lk.AddField(Field{Name: relation.Child, Type: "manychild", Object: lk.Name})
+			lk.AddField(Field{Name: relation.Parent, Type: "manychild", Object: lk.Name})
 			list = append(list, *lk)
 			for i, entity := range list {
 				if relation.Child == entity.Name {
-					list[i].addField(Field{Name: relation.Parent, Type: "manyparent", Object: lk.Name})
+					list[i].AddField(Field{Name: relation.Parent, Type: "manyparent", Object: lk.Name})
 				}
 				if relation.Parent == entity.Name {
-					list[i].addField(Field{Name: relation.Child, Type: "manyparent", Object: lk.Name})
+					list[i].AddField(Field{Name: relation.Child, Type: "manyparent", Object: lk.Name})
 				}
 			}
 		}
@@ -142,46 +148,75 @@ func parseRelations(list []Entity) []Entity {
 	return list
 }
 
+// generate app models and copies basic database functions
+func generateModel(mt *template.Template) {
+	var err error
+
+	for _, e := range obj.Entities {
+		var output *os.File
+		defer output.Close()
+		obj.Object = e
+		output, err = os.Create(obj.ApplicationPath + "/model/" + strings.ToLower(e.Name) + ".go")
+		if err != nil {
+			log.Fatalf("File creation: %s", err)
+		}
+
+		err = mt.ExecuteTemplate(output, "model", obj)
+		if err != nil {
+			log.Fatalf("template execution: %s", err)
+		}
+
+		fmt.Println("model generated: " + output.Name())
+	}
+
+	// Copy of database.go
+	err = copyFile("model/database.go", obj.ApplicationPath+"/model/database.go")
+	if err != nil {
+		log.Fatalf("Copy of .go file: %s", err)
+	}
+	fmt.Println("models finished")
+}
+
+// generate app controller and copies basic functions
+func generateController(ct *template.Template) {
+	// Copy of database.go
+	err := copyFile("template/controller.tmpl", obj.ApplicationPath+"/controller/controller.go")
+	if err != nil {
+		log.Fatalf("Copy of .go file: %s", err)
+	}
+	fmt.Println("controllers finished")
+
+}
+
+var obj ObjectModel
+
 func main() {
 	var err error
-	var obj ObjectModel
+
 	obj.ApplicationName = "CRUD"
 	obj.ApplicationPath = "/Users/A.Eisner/go/src/" + obj.ApplicationName
 	obj.CreateTargetApp()
 
-	_, obj.Entities = getAllEntities()
-	fmt.Println(len(obj.Entities))
+	_, obj.Entities = GetAllEntities()
 	obj.Entities = identifyLookups(obj.Entities)
 	obj.Entities = parseRelations(obj.Entities)
-	fmt.Println(obj)
+	fmt.Printf("%d entities loaded.\n", len(obj.Entities))
 
+	// pluralize and sigularize functions for templates
 	pl := pluralize.NewClient()
-
 	// First we create a FuncMap with which to register the function.
 	funcMap := template.FuncMap{
 		"lowercase": strings.ToLower, "singular": pl.Singular, "plural": pl.Plural,
 	}
 
-	fmt.Println("models")
 	// Rendering the model components
 	modeltmpl, err := template.New("model").Funcs(funcMap).ParseFiles("template/model.tmpl", "template/types.tmpl")
-	for _, e := range obj.Entities {
-		var output *os.File
-		defer output.Close()
-		obj.Object = e
-
-		output, err = os.Create(obj.ApplicationPath + "/" + strings.ToLower(e.Name) + ".go")
-		if err != nil {
-			log.Fatalf("File creation: %s", err)
-		}
-
-		err = modeltmpl.ExecuteTemplate(output, "model", obj.Object)
-		if err != nil {
-			log.Fatalf("template execution: %s", err)
-		}
-
-		fmt.Println(output.Name())
+	if err != nil {
+		log.Fatalf("Error in model templates: %s", err)
 	}
+	generateModel(modeltmpl)
+
+	generateController(modeltmpl)
 
 	fmt.Println("views")
 	// Copy the view components
@@ -228,9 +263,7 @@ func main() {
 	}
 	output.Close()
 
-	// 		listtmpl, _ := template.New("list").Funcs(funcMap).ParseFiles("template/base.html", "template/list.html")
-
-	// Rendering the listview components
+	// Rendering the list view components
 	listtmpl, _ := template.New("list").Funcs(funcMap).ParseFiles("template/list.html")
 	if err != nil {
 		log.Fatalf("Parse list template: %s", err)
@@ -247,7 +280,7 @@ func main() {
 		}
 	}
 
-	// Rendering the listview components
+	// Rendering the listtable view components
 	listtabletmpl, _ := template.New("list").Funcs(funcMap).ParseFiles("template/listtable.html")
 	if err != nil {
 		log.Fatalf("Parse list template: %s", err)
@@ -282,11 +315,6 @@ func main() {
 	}
 
 	// Application classes:
-	// Copy of database.go
-	err = copyFile("database.go", obj.ApplicationPath+"/database.go")
-	if err != nil {
-		log.Fatalf("Copy of .go files: %s", err)
-	}
 
 	// Rendering the main.go
 	maintmpl, err := template.New("main").Funcs(funcMap).ParseFiles("template/main.tmpl")

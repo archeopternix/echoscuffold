@@ -1,5 +1,5 @@
-// AccountManager project main.go
-package main
+// Scuffolding for echo framework:  https://echo.labstack.com/
+package model
 
 import (
 	"strconv"
@@ -43,7 +43,7 @@ func NewEntity() (e *Entity) {
 	return e
 }
 
-func (e *Entity) addField(f Field) {
+func (e *Entity) AddField(f Field) {
 	e.Fields = append(e.Fields, f)
 }
 
@@ -58,7 +58,7 @@ func (e Entity) TimeStamp() string {
 }
 
 // Database access functions
-func getAllEntities() (err error, entities []Entity) {
+func GetAllEntities() (err error, entities []Entity) {
 	err = Database.Open(Entity{}).Get().AsEntity(&entities)
 	if err != nil {
 		panic(err)
@@ -66,7 +66,7 @@ func getAllEntities() (err error, entities []Entity) {
 	return err, entities
 }
 
-func getEntityById(id int) (err error, entity Entity) {
+func GetEntityById(id int) (err error, entity Entity) {
 	err = Database.Open(Entity{}).Where("id", "=", id).First().AsEntity(&entity)
 	if err != nil {
 		panic(err)
@@ -87,7 +87,7 @@ func (e Relation) ID() (jsonField string, value interface{}) {
 }
 
 // Database access functions
-func getAllRelations() (entities []Relation) {
+func GetAllRelations() (entities []Relation) {
 	err := Database.Open(Relation{}).Get().AsEntity(&entities)
 	if err != nil {
 		panic(err)

@@ -1,4 +1,5 @@
-package main
+// Scuffolding for echo framework:  https://echo.labstack.com/
+package model
 
 import "github.com/sonyarouje/simdb/db"
 

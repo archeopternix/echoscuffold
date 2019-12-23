@@ -59,7 +59,7 @@ func (e Entity) TimeStamp() string {
 
 // Database access functions
 func getAllEntities() (err error, entities []Entity) {
-	err = Database.Open(Entity{}).Where("id", ">", 0).Get().AsEntity(&entities)
+	err = Database.Open(Entity{}).Get().AsEntity(&entities)
 	if err != nil {
 		panic(err)
 	}

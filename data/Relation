@@ -1,8 +1,14 @@
 [
 	{
 		"id": "1",
-		"parent": "Entry",
-		"child": "Entrytype",
+		"parent": "Project",
+		"child": "Entity",
+		"kind": "one2many"
+	},
+	{
+		"id": "2",
+		"parent": "Entity",
+		"child": "Field",
 		"kind": "one2many"
 	}
 ]

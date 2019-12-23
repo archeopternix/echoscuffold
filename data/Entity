@@ -1,29 +1,26 @@
 [
 	{
 		"id": 3,
-		"name": "Entry",
+		"name": "Project",
+		"type": 0,
 		"fields": [
 			{
-				"name": "Personalnumber",
+				"name": "Name",
 				"type": "string",				
-				"size": 20,
+				"maxlength": 30,
 				"required": true,
 				"islabel": true
 			},		
 			{
-				"name": "Email",
-				"type": "email",				
-				"required": false
+				"name": "Gcpid",
+				"type": "string",	
+				"size": 30,
+				"required": true
 			},			
 			{
-				"name": "Required",
-				"type": "bool",
-				"required": false
-			},
-			{
-				"name": "Fieldtype",
-				"object": "Fieldtype",
-				"type": "lookup",
+				"name": "Description",
+				"type": "text",
+				"size": 240,
 				"required": false
 			}
 		]
@@ -31,22 +28,89 @@
 	},
 	{
 		"id": 4,
-		"name": "Entrytype",
+		"name": "Entity",
+		"type": 0,
 		"fields": [
 			{
 				"name": "Name",
 				"type": "string",
+				"required": true,
+				"islabel": true
+			}
+		]
+	},
+	{
+		"id": 5,
+		"name": "Field",
+		"type": 0,
+		"fields": [
+			{
+				"name": "Name",
+				"type": "string",
+				"required": true,
 				"islabel": true
 			},
 			{
-				"name": "Email",
-				"type": "email",				
-				"required": true
+				"name": "Type",
+				"type": "lookup",				
+				"object":"Fieldtype"
+			},					
+			{
+				"name": "Required",
+				"type": "bool",
+				"required": false
+			},						
+			{
+				"name": "IsLabel",
+				"type": "bool",
+				"required": false
+			},	
+			{
+				"name": "Object",
+				"type": "string",
+				"required": false
 			},		
 			{
-				"name": "Phone",
-				"type": "tel",
-				"required": true
+				"name": "Maxlength",
+				"type": "int",
+				"size": 4,
+				"step": 1,
+				"required": false
+			},		
+			{
+				"name": "Size",
+				"type": "int",
+				"size": 4,
+				"step": 1,
+				"required": false
+			},		
+			{
+				"name": "Step",
+				"type": "int",
+				"size": 4,
+				"step": 1,
+				"required": false
+			},		
+			{
+				"name": "Min",
+				"type": "int",
+				"size": 4,
+				"step": 1,
+				"required": false
+			},		
+			{
+				"name": "Max",
+				"type": "int",
+				"size": 4,
+				"step": 1,
+				"required": false
+			},		
+			{
+				"name": "Rows",
+				"type": "int",
+				"size": 4,
+				"step": 1,
+				"required": false
 			}
 		]
 	}

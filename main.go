@@ -244,7 +244,7 @@ func main() {
 
 	fmt.Println("views")
 	// Copy the view components
-	err = copyFile("template/base.html", app.Path+"/view/base.html")
+	err = copyFile("template/base.html", app.Path+"/view/_base.html")
 	if err != nil {
 		log.Fatalf("Copy of base: %s", err)
 	}

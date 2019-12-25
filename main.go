@@ -277,7 +277,7 @@ func main() {
 	var output *os.File
 	defer output.Close()
 
-	output, err = os.Create(app.Path + "/view/sidenav.html")
+	output, err = os.Create(app.Path + "/view/_sidenav.html")
 	if err != nil {
 		log.Fatalf("File creation: %s", err)
 	}

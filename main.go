@@ -204,7 +204,6 @@ func generateController(ct *template.Template) {
 		log.Fatalf("Copy of .go file: %s", err)
 	}
 	fmt.Println("controllers finished")
-
 }
 
 var app AppModel
@@ -282,6 +281,24 @@ func main() {
 		log.Fatalf("File creation: %s", err)
 	}
 	err = sidenavtmpl.ExecuteTemplate(output, "sidenav", app)
+	if err != nil {
+		log.Fatalf("template execution: %s", err)
+	}
+	output.Close()
+
+	// Rendering the dashboard
+	dashtmpl, err := template.New("dashboard").Funcs(funcMap).ParseFiles("template/dashboard.html")
+	if err != nil {
+		log.Fatalf("Parse dashboard template: %s", err)
+	}
+
+	defer output.Close()
+
+	output, err = os.Create(app.Path + "/view/dashboard.html")
+	if err != nil {
+		log.Fatalf("File creation: %s", err)
+	}
+	err = dashtmpl.ExecuteTemplate(output, "dashboard", app)
 	if err != nil {
 		log.Fatalf("template execution: %s", err)
 	}

@@ -1,5 +1,6 @@
 {{define "types"}}
 {{- if eq .Type "string"}}	{{.Name}}	string	`json:"{{lowercase .Name}}"`{{end}}
+{{- if eq .Type "password"}}	{{.Name}}	string	`json:"{{lowercase .Name}}"`{{end}}
 {{- if eq .Type "int"}}	{{.Name}}	int	`json:"{{lowercase .Name}}"`{{end}}
 {{- if eq .Type "bool"}}	{{.Name}}	bool	`json:"{{lowercase .Name}}"`{{end}}
 {{- if eq .Type "email"}}	{{.Name}}	string	`json:"{{lowercase .Name}}"`{{end}}

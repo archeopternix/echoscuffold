@@ -243,7 +243,7 @@ func main() {
 
 	fmt.Println("views")
 	// Copy the view components
-	err = copyFile("template/base.html", app.Path+"/view/base.html")
+	err = copyFile("template/base.html", app.Path+"/view/_base.html")
 	if err != nil {
 		log.Fatalf("Copy of base: %s", err)
 	}
@@ -276,7 +276,7 @@ func main() {
 	var output *os.File
 	defer output.Close()
 
-	output, err = os.Create(app.Path + "/view/sidenav.html")
+	output, err = os.Create(app.Path + "/view/_sidenav.html")
 	if err != nil {
 		log.Fatalf("File creation: %s", err)
 	}

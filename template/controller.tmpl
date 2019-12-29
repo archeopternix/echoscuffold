@@ -18,7 +18,7 @@ import (
 func List{{plural .Name}}(c echo.Context) error {
 	err, {{.Name | plural | lowercase}} := GetAll{{plural .Name}}()
 	if err != nil {
-		panic(err)
+		return echo.NewHTTPError(http.StatusNotFound, "{{plural .Name}} not found")
 	}
 	p:=NewPage("{{.Name | plural}}")
 	p.Data = {{.Name | plural | lowercase}}
@@ -31,7 +31,7 @@ func Get{{.Name}}(c echo.Context) error {
 
 	err, {{lowercase .Name}} := Get{{.Name}}ById(id)
 	if err != nil {
-		panic(err)
+		return echo.NewHTTPError(http.StatusNotFound, "{{.Name}} with id:"+id+" not found")
 	}
 	{{$name := .Name}}
 	{{range .Fields}}{{if eq .Type "parent"}}
@@ -57,12 +57,20 @@ func New{{.Name}}(c echo.Context) error {
 func Create{{.Name}}(c echo.Context) (err error) {
 	{{lowercase .Name}} := new({{.Name}})
   	if err = c.Bind({{lowercase .Name}}); err != nil {
-  	  panic(err)
+		return echo.NewHTTPError(http.StatusNotFound, "{{.Name}} could not bound to params")
   	}
+
+	p:=NewPage("Error {{.Name}}")
+	p.Data = {{lowercase .Name}}
+	
+	if validate(p) == false {
+    	return c.Render(http.StatusOK, "{{lowercase .Name}}detail", p)
+  	}
+	
 	{{lowercase .Name}}.Id = strconv.Itoa(NextId({{.Name | printf "%q"}}))
 	err = Database.Insert({{lowercase .Name}})
 	if err != nil {
-		panic(err)
+		return echo.NewHTTPError(http.StatusNotFound, "Database: {{.Name}} could not created")
 	}
 	
 	return List{{plural .Name}}(c)
@@ -72,12 +80,12 @@ func Create{{.Name}}(c echo.Context) (err error) {
 func Update{{.Name}}(c echo.Context) (err error) {
 	{{lowercase .Name}} := new({{.Name}})
   	if err = c.Bind({{lowercase .Name}}); err != nil {
-  	  return
+		return echo.NewHTTPError(http.StatusNotFound, "{{.Name}} could not bound to params")
   	}
 
 	err = Database.Update({{lowercase .Name}})
 	if err != nil {
-		panic(err)
+		return echo.NewHTTPError(http.StatusNotFound, "Database: {{.Name}} could not be updated")
 	}
 
 	return List{{plural .Name}}(c)
@@ -88,13 +96,28 @@ func Delete{{.Name}}(c echo.Context) error {
 	id := c.Param("id")
 	err, {{lowercase .Name}} := Get{{.Name}}ById(id)
 	if err != nil {
-		panic(err)
+		return echo.NewHTTPError(http.StatusNotFound, "{{.Name}} with id:"+id+" not found")
 	}
 	err = Database.Delete({{lowercase .Name}})
 	if err != nil {
-		panic(err)
+		return echo.NewHTTPError(http.StatusNotFound, "Database: {{.Name}} could not be deleted")
 	}
 	
 	return List{{plural .Name}}(c)
+}
+
+// generic validation handler for form
+func validate(p *Page) bool{
+	p.Errors = make(map[string]string)
+	data := p.Data.(*User)
+	{{range .Fields}}
+	{{- if eq .Type "string" "email" "tel" "text" "password"}} if (data.{{.Name}} != "") {		// ToDo: validation Code for {{.Name}}
+		p.Errors["{{.Name}}"]="Please correct error!"	
+	}
+	{{else if eq .Type "bool"}} if (data.{{.Name}} != true) {		// ToDo: validation Code for {{.Name}}
+		p.Errors["{{.Name}}"]="Please correct error!"
+	}
+	{{end}}{{end}}
+	return len(p.Errors) == 0
 }
 {{end}}{{end}}

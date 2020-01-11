@@ -2,6 +2,16 @@
             </div>
         </div>
     </div>
+    <script type="text/javascript">
+       function togglePassword(field) {
+      var x = document.getElementById(field);
+      if (x.type === "password") {
+        x.type = "text";
+      } else {
+        x.type = "password";
+      }
+    }                                 
+    </script>  
 </body>
 </html>
 {{end}}

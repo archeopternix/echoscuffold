@@ -29,9 +29,10 @@
                         </div>
                       </form>
                       <hr class="hr" style="margin-bottom: 0;">
+                      {{"{{- if .Id}}"}} 
                       {{- range .Fields}}{{if eq .Type "parent"}}
                       {{"{{"}}template "{{.Object | singular | lowercase}}listtable" .{{.Object | plural}}{{"}}"}}
-                      {{- end}}{{end}}
+                      {{- end}}{{end}}{{"{{"}}end{{"}}"}} 
 {{"{{- end}}"}}  
 {{"{{"}}template "_footer" .{{"}}"}}
 {{"{{"}}end{{"}}"}}         
@@ -45,10 +46,15 @@
                                   </div>
                                   {{- "{{"}}with $errors.{{.Name}}{{"}}"}} <p class="help is-danger">{{"{{"}}.{{"}}"}} </p>{{"{{"}}end{{"}}"}}
                                 </div>{{end}}
-{{- if eq .Type "password"}}            <div class="field">
-                                  <label class="label">{{.Name}} {{with .Required}}*{{end}}</label>
+{{- if eq .Type "password"}}            <label class="label">{{.Name}} {{with .Required}}*{{end}}</label>
+                                <div class="field is-grouped">                                  
                                   <div class="control">
                                     <input class="input{{"{{"}}with $errors.{{.Name}}{{"}}"}} is-danger{{"{{"}}end{{"}}"}}" type="password" placeholder="****" name="{{.Name | lowercase}}" id="{{.Name | lowercase}}" {{if gt .Maxlength 0}}maxlength="{{.Maxlength}}"{{end}} {{if gt .Size 0}}size="{{.Size}}"{{end}} value="{{"{{"}}.{{.Name}}{{"}}"}}" {{with .Required}}required{{end}}>
+                                  </div>
+                                  <div class="control">
+                                    <a class="button is-info" onmousedown="togglePassword('{{.Name | lowercase}}')" onmouseup="togglePassword('{{.Name | lowercase}}')">
+                                      Show
+                                    </a>
                                   </div>
                                   {{- "{{"}}with $errors.{{.Name}}{{"}}"}} <p class="help is-danger">{{"{{"}}.{{"}}"}} </p>{{"{{"}}end{{"}}"}}
                                 </div>{{end}}

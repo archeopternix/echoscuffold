@@ -14,12 +14,16 @@ type {{.Name}} struct {
 {{end -}}
 }
 
+// Returns the unique ID for the JSON database
+// https://godoc.org/github.com/sonyarouje/simdb/db
 func (obj {{.Name}}) ID() (jsonField string, value interface{}) {
 	value = obj.Id
 	jsonField = "id"
 	return
 }
 
+// Label for {{.Name}} that will be shown in select boxes for one-2-many relationships
+// Select boxes returns the the ID of the parent Entity
 {{$name := .Name}}
 {{- range .Fields}}{{- if eq .IsLabel true}}
 func (obj {{$name}}) Label() (string) {
@@ -27,8 +31,9 @@ func (obj {{$name}}) Label() (string) {
 }
 {{- end}}{{end}}
 
-// Database access functions
-// retrieve all entries for specified Object
+// Database access functions:
+
+// Retrieve all entries for {{.Name}} from JSON database
 func GetAll{{plural .Name}}() (err error, entities []{{.Name}}) {
 	err = Database.Open({{.Name}}{}).Get().AsEntity(&entities)
 	if err != nil {
@@ -37,7 +42,7 @@ func GetAll{{plural .Name}}() (err error, entities []{{.Name}}) {
 	return err, entities
 }
 
-// retrieve the entry with specific Id
+// retrieve the first {{.Name}} with specific Id from JSON database
 func Get{{.Name}}ById(id string) (err error, entity {{.Name}}) {
 	err = Database.Open({{.Name}}{}).Where("id", "=", id).First().AsEntity(&entity)
 	if err != nil {
@@ -48,7 +53,7 @@ func Get{{.Name}}ById(id string) (err error, entity {{.Name}}) {
 
 {{$name := .Name}}
 {{- range .Fields}}{{if eq .Type "child"}}
-// retrieve all entries with specific ParentId
+// retrieve all {{$name | plural}} with same parent Id. All childs to one parent record
 func GetAll{{$name | plural}}By{{.Object}}Id(parentid string) (err error, entities []{{$name}}) {
 	err = Database.Open({{$name}}{}).Where("{{.Name | lowercase}}id", "=", parentid).Get().AsEntity(&entities)
 	if err != nil {
@@ -57,6 +62,8 @@ func GetAll{{$name | plural}}By{{.Object}}Id(parentid string) (err error, entiti
 	return err, entities
 }
 
+// Label from {{.Object}} (parent) that will be shown in select boxes for one-2-many relationships
+// Select boxes returns the the ID of the parent Entity
 func (obj {{$name}}) LabelBy{{.Object}}Id(id string) (string){
 	var entity {{.Object}}
 	err := Database.Open({{.Object}}{}).Where("id", "=", id).First().AsEntity(&entity)
@@ -67,9 +74,10 @@ func (obj {{$name}}) LabelBy{{.Object}}Id(id string) (string){
 }
 {{end}}{{end}}
 
-{{$name := .Name}}
+// Lookup helper function
+{{- $name := .Name}}
 {{range $i, $field := .Fields}}{{if eq $field.Type "lookup" "child"}}
-// Access lookup entries for {{$field.Object}}
+// Loads all lookup entries for {{$field.Object}}
 func (obj {{$name}}) Lookup{{$field.Object}}() ([]{{$field.Object}}) {
 	err, {{$field.Object | lowercase}} := GetAll{{$field.Object | plural}}()
 	if err != nil {

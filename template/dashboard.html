@@ -1,5 +1,19 @@
 {{define "dashboard" -}}
-{{template "base" .}}
+{{"{{"}}define "dashboard" {{"}}"}}
+{{"{{"}}template "base" .{{"}}"}}
+              <section class="info-tiles">
+                    <div class="tile is-ancestor has-text-centered">
+                      {{range .Entities}}
+                        <div class="tile is-parent">
+                            <article class="tile is-child box">
+                            <a href="/{{.Name | lowercase | plural}}">
+                                <p class="title">{{.Name}}</p>
+                            </a>
+                            </article>
+                        </div>{{end}}
+                    </div>
+                </section>
 <h2>Dashboard</h2>
-{{template "_footer" .}}      
+{{"{{"}}template "_footer" .{{"}}"}}
+{{"{{"}}end{{"}}"}}        
 {{end}}

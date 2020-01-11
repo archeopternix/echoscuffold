@@ -11,17 +11,27 @@
                                         {{range .Fields -}}
                                           {{if eq .Type "manyparent" "parent" }}{{else}}<th>{{.Name}}</th>{{- end}}
                                         {{end -}}
-                                        <th>Actions</th>	
+                                        <th></th>	
                                       </tr>
                                     </thead>
                                         <tbody>
                                           {{"{{"}}range .{{"}}"}}
                                           <tr>
                                             <td>{{"{{.Id}}"}}</td>{{$entityname := .Name}}
-                                            {{range .Fields}}{{if eq .Type "manyparent" "parent"}}{{else}}<td>{{if eq .Type "child"}}{{"{{"}}.LabelBy{{.Object}}Id .{{.Name}}Id{{"}}"}}{{else}}{{if eq .IsLabel true}}<a href="/{{$entityname | plural | lowercase}}/{{"{{.Id}}"}}">{{"{{"}}.{{.Name}}{{"}}"}}</a>{{else}}{{"{{"}}.{{.Name}}{{"}}"}}{{end}}{{end}}</td>{{end}}	
+                                            {{range .Fields}}
+                                              {{- if eq .Type "manyparent" "parent"}}
+                                              {{- else}}<td>
+                                                {{- if eq .Type "child"}}{{"{{"}}.LabelBy{{.Object}}Id .{{.Name}}Id{{"}}"}}
+                                                {{- else if eq .IsLabel true}}<a href="/{{$entityname | plural | lowercase}}/{{"{{.Id}}"}}">{{"{{"}}.{{.Name}}{{"}}"}}</a>
+                                                {{- else if eq .Type "bool"}}<span>
+                                                {{"{{"}}if eq .{{.Name}} true{{"}}"}}<i class="far fa-check-square"></i>{{"{{"}}else{{"}}"}}<i class="far fa-square"></i>{{"{{"}}end{{"}}"}}
+                                                </span>
+                                                {{- else}}{{"{{"}}.{{.Name}}{{"}}"}}
+                                              {{- end}}</td>{{end}}	
                                             {{end -}}
-                                            <td><form method="post" action="/{{.Name | plural | lowercase}}/{{"{{.Id}}"}}/delete" name="{{"{{.Id}}"}}">
-                                            <div class="buttons">
+                                            <td>
+                                            <div class="buttons is-right">
+                                            <form method="post" action="/{{.Name | plural | lowercase}}/{{"{{.Id}}"}}/delete" name="{{"{{.Id}}"}}">
                                               <button class="button is-secondary">    
                                                 <span class="icon">
                                                   <i class="far fa-trash-alt"></i>
@@ -34,8 +44,9 @@
                                                 </span>
                                                 <span>Edit</span>
                                               </button>
+                                            </form> 
                                             </div>
-                                            </form>  </td>  
+                                            </td>  
                                           </tr>
                                           {{"{{end}}"}}
                                         </tbody>
@@ -55,4 +66,5 @@
                         </div>  
 {{"{{"}}end{{"}}"}}         
 {{end}}
+
 

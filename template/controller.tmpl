@@ -63,7 +63,7 @@ func Create{{.Name}}(c echo.Context) (err error) {
 	p:=NewPage("Error {{.Name}}")
 	p.Data = {{lowercase .Name}}
 	
-	if validate(p) == false {
+	if validate{{.Name}}(p) == false {
     	return c.Render(http.StatusOK, "{{lowercase .Name}}detail", p)
   	}
 	
@@ -107,17 +107,20 @@ func Delete{{.Name}}(c echo.Context) error {
 }
 
 // generic validation handler for form
-func validate(p *Page) bool{
+func validate{{.Name}}(p *Page) bool{
+	return true // ToDo: custom validation
+	/*
 	p.Errors = make(map[string]string)
-	data := p.Data.(*User)
+	data := p.Data.(*{{.Name}})
 	{{range .Fields}}
-	{{- if eq .Type "string" "email" "tel" "text" "password"}} if (data.{{.Name}} != "") {		// ToDo: validation Code for {{.Name}}
+	{{- if eq .Type "string" "email" "tel" "text" "password"}} if (data.{{.Name}} != "") {		
 		p.Errors["{{.Name}}"]="Please correct error!"	
 	}
-	{{else if eq .Type "bool"}} if (data.{{.Name}} != true) {		// ToDo: validation Code for {{.Name}}
+	{{else if eq .Type "bool"}} if (data.{{.Name}} != true) {		
 		p.Errors["{{.Name}}"]="Please correct error!"
 	}
 	{{end}}{{end}}
 	return len(p.Errors) == 0
+	*/
 }
 {{end}}{{end}}

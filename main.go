@@ -212,8 +212,8 @@ var app AppModel
 func main() {
 	var err error
 
-	app.Name = "CRUD"
-	app.Path = "/Users/A.Eisner/go/src/" + app.Name
+	app.Name = "etracker"
+	app.Path = "/Users/Andreas Eisner/go/src/" + app.Name
 	app.CreateTargetApp()
 
 	_, app.Entities = GetAllEntities()

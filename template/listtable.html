@@ -7,7 +7,6 @@
                                     <table class="table is-fullwidth is-striped">
                                      <thead>
                                       <tr>
-                                        <th>Id</th>	
                                         {{range .Fields -}}
                                           {{if eq .Type "manyparent" "parent" }}{{else}}<th>{{.Name}}</th>{{- end}}
                                         {{end -}}
@@ -17,7 +16,7 @@
                                         <tbody>
                                           {{"{{"}}range .{{"}}"}}
                                           <tr>
-                                            <td>{{"{{.Id}}"}}</td>{{$entityname := .Name}}
+                                            {{- $entityname := .Name}}
                                             {{range .Fields}}
                                               {{- if eq .Type "manyparent" "parent"}}
                                               {{- else}}<td>

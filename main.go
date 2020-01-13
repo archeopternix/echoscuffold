@@ -28,8 +28,9 @@ type AppModel struct {
 
 // App configurtations
 type Config struct {
-	Path string
-	Name string
+	Path  string
+	Name  string
+	Title string
 }
 
 // Creates standard app directories
@@ -211,7 +212,8 @@ var app AppModel
 func main() {
 	var err error
 
-	app.Name = "etracker"
+	app.Name = "User"
+	app.Title = "Usermanagement for eTracker Accounts"
 	app.Path = "/Users/Andreas Eisner/go/src/" + app.Name
 	app.CreateTargetApp()
 

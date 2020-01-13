@@ -1,0 +1,137 @@
+[
+	{
+		"id": 8,
+		"name": "User",
+		"type": 0,
+		"fields": [
+			{
+				"name": "Name",
+				"type": "string",
+				"maxlength": 80,
+				"required": true
+			},			
+			{
+				"name": "Fname",
+				"type": "string",
+				"maxlength": 80,
+				"required": true
+			},			
+			{
+				"name": "Email",
+				"type": "email",
+				"required": true,
+				"islabel": true
+			},		
+			{
+				"name": "Password",
+				"type": "password",	
+				"size": 30,
+				"required": true
+			},
+			{
+				"name": "Login",
+				"type": "int"
+			},			
+			{
+				"name": "Sex",
+				"type": "lookup",
+				"object": "Sex"
+			}			
+		]
+	},
+	{
+		"id": 1,
+		"name": "Accuser",
+		"type": 0,
+		"fields": [
+			{
+				"name": "Subid",
+				"type": "string",
+				"maxlength": 4
+			},			
+			{
+				"name": "Roletype",
+				"type": "string",
+				"maxlength": 80
+			},			
+			{
+				"name": "Enable",
+				"type": "bool"
+			},			
+			{
+				"name": "Login",
+				"type": "int"
+			}			
+		]
+	},
+	{
+		"id": 2,
+		"name": "Account",
+		"type": 0,
+		"fields": [
+			{
+				"name": "Name",
+				"type": "string",
+				"maxlength": 80,
+				"islabel": true
+
+			},			
+			{
+				"name": "Number",
+				"type": "string",
+				"maxlength": 80
+			},			
+			{
+				"name": "Password",
+				"type": "password",	
+				"size": 30,
+				"required": true
+			},	
+			{
+				"name": "Enable",
+				"type": "bool"
+			}			
+		]
+	},
+	{
+		"id": 3,
+		"name": "Role",
+		"type": 0,
+		"fields": [
+			{
+				"name": "Name",
+				"type": "string",
+				"maxlength": 80,
+				"islabel": true
+			},			
+			{
+				"name": "Version",
+				"type": "string",
+				"maxlength": 80
+			},			
+			{
+				"name": "Users",
+				"type": "string",	
+				"size": 30
+			}			
+		]
+	},
+	{
+		"id": 5,
+		"name": "Language",
+		"type": 0,
+		"fields": [
+			{
+				"name": "Name",
+				"type": "string",
+				"maxlength": 80,
+				"islabel": true
+			},	
+			{
+				"name": "Code",
+				"type": "string",
+				"maxlength": 2
+			}	
+		]
+	}
+]

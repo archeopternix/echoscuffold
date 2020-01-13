@@ -211,7 +211,7 @@ var app AppModel
 func main() {
 	var err error
 
-	app.Name = "etracker"
+	app.Name = "crud"
 	app.Path = "/Users/Andreas Eisner/go/src/" + app.Name
 	app.CreateTargetApp()
 

@@ -1,7 +1,7 @@
 [
 	{
-		"id": 8,
-		"name": "User",
+		"id": 1,
+		"name": "Project",
 		"type": 0,
 		"fields": [
 			{
@@ -11,127 +11,176 @@
 				"required": true
 			},			
 			{
-				"name": "Fname",
+				"name": "Title",
 				"type": "string",
 				"maxlength": 80,
-				"required": true
-			},			
-			{
-				"name": "Email",
-				"type": "email",
 				"required": true,
 				"islabel": true
-			},		
-			{
-				"name": "Password",
-				"type": "password",	
-				"size": 30,
-				"required": true
-			},
-			{
-				"name": "Login",
-				"type": "int"
 			},			
 			{
-				"name": "Sex",
-				"type": "lookup",
-				"object": "Sex"
-			}			
-		]
-	},
-	{
-		"id": 1,
-		"name": "Accuser",
-		"type": 0,
-		"fields": [
-			{
-				"name": "Subid",
+				"name": "Description",
 				"type": "string",
-				"maxlength": 4
-			},			
-			{
-				"name": "Roletype",
-				"type": "string",
-				"maxlength": 80
-			},			
-			{
-				"name": "Enable",
-				"type": "bool"
-			},			
-			{
-				"name": "Login",
-				"type": "int"
-			}			
+				"maxlength": 250
+			}
 		]
-	},
+	},	
 	{
 		"id": 2,
-		"name": "Account",
+		"name": "Entity",
 		"type": 0,
 		"fields": [
 			{
 				"name": "Name",
 				"type": "string",
+				"maxlength": 12,
+				"size":12,
+				"required": true,
+				"islabel": true
+			},			
+			{
+				"name": "Entitytype",
+				"type": "lookup",
+				"object": "Entitytype"
+			}			
+		]
+	},
+	{
+		"id": 10,
+		"name": "Entitytype",
+		"type": 1,
+		"fields": [
+			{
+				"name": "Name",
+				"type": "string",
+				"required": true,
+				"maxlength": 80,
+				"islabel": true
+			},
+			{
+				"name": "Number",
+				"type": "number",
+				"step": 1
+			}			
+		]
+	},
+	{
+		"id": 11,
+		"name": "Fieldtype",
+		"type": 1,
+		"fields": [
+			{
+				"name": "Name",
+				"type": "string",
+				"required": true,
+				"maxlength": 80,
+				"islabel": true
+			},
+			{
+				"name": "Number",
+				"type": "number",
+				"step": 1
+			}			
+		]
+	},
+	{
+		"id": 12,
+		"name": "Relationtype",
+		"type": 1,
+		"fields": [
+			{
+				"name": "Name",
+				"type": "string",
+				"required": true,
+				"maxlength": 80,
+				"islabel": true
+			}
+		]
+	},
+	{
+		"id": 3,
+		"name": "Field",
+		"type": 0,
+		"fields": [
+			{
+				"name": "Name",
+				"type": "string",
+				"required": true,
 				"maxlength": 80,
 				"islabel": true
 
 			},			
 			{
-				"name": "Number",
+				"name": "Fieldtype",
+				"type": "lookup",
+				"object": "Fieldtype"
+			},				
+			{
+				"name": "Object",
 				"type": "string",
 				"maxlength": 80
 			},			
 			{
-				"name": "Password",
-				"type": "password",	
-				"size": 30,
-				"required": true
+				"name": "Maxlenght",
+				"type": "number",	
+				"step": 1,
+				"size": 4,
+				"min": 0
 			},	
 			{
-				"name": "Enable",
+				"name": "Size",
+				"type": "number",	
+				"step": 1,
+				"size": 4,
+				"min": 0
+			},	
+			{
+				"name": "Step",
+				"type": "number",	
+				"step": 1,
+				"size": 4,
+				"min": 0
+			},	
+			{
+				"name": "Min",
+				"type": "number",	
+				"step": 1,
+				"size": 4,
+				"min": 0
+			},	
+			{
+				"name": "Max",
+				"type": "number",	
+				"step": 1,
+				"size": 4,
+				"min": 0
+			},	
+			{
+				"name": "Rows",
+				"type": "number",	
+				"step": 1,
+				"size": 2,
+				"min": 0
+			},	
+			{
+				"name": "Required",
 				"type": "bool"
-			}			
-		]
-	},
-	{
-		"id": 3,
-		"name": "Role",
-		"type": 0,
-		"fields": [
+			},	
 			{
-				"name": "Name",
-				"type": "string",
-				"maxlength": 80,
-				"islabel": true
-			},			
-			{
-				"name": "Version",
-				"type": "string",
-				"maxlength": 80
-			},			
-			{
-				"name": "Users",
-				"type": "string",	
-				"size": 30
-			}			
+				"name": "IsLabel",
+				"type": "bool"
+			}						
 		]
 	},
 	{
 		"id": 5,
-		"name": "Language",
+		"name": "Relation",
 		"type": 0,
 		"fields": [
 			{
-				"name": "Name",
-				"type": "string",
-				"maxlength": 80,
-				"islabel": true
-			},	
-			{
-				"name": "Code",
-				"type": "string",
-				"maxlength": 2
-			}	
+				"name": "Relationtype",
+				"type": "lookup",
+				"object": "Relationtype"
+			}			
 		]
 	}
 ]

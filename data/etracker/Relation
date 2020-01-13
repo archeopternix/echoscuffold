@@ -1,0 +1,32 @@
+[
+	{
+		"id": "1",
+		"parent": "Account",
+		"child": "Role",	
+		"kind": "one2many"	
+	},
+	{
+		"id": "2",
+		"parent": "Account",
+		"child": "Accuser",	
+		"kind": "one2many"	
+	},
+	{
+		"id": "3",
+		"parent": "Role",
+		"child": "Accuser",	
+		"kind": "one2many"	
+	},
+	{
+		"id": "4",
+		"parent": "User",
+		"child": "Accuser",	
+		"kind": "one2many"	
+	},
+	{
+		"id": "5",
+		"parent": "Language",
+		"child": "User",	
+		"kind": "one2many"	
+	}
+]

@@ -92,6 +92,13 @@
                                   </div>
                                   {{- "{{"}}with $errors.{{.Name}}{{"}}"}} <p class="help is-danger">{{"{{"}}.{{"}}"}} </p>{{"{{"}}end{{"}}"}}
                                 </div>{{end}}
+{{- if eq .Type "number"}}             <div class="field">
+                                  <label class="label">{{.Name}} {{with .Required}}*{{end}}</label>
+                                  <div class="control">
+                                    <input class="input" type="number" {{if gt .Step 0}}step="{{.Step}}"{{end}}  {{if gt .Min 0}}min="{{.Min}}"{{end}} {{if gt .Max 0}}max="{{.Max}}"{{end}} placeholder="Number input" name="{{.Name | lowercase}}" id="{{.Name | lowercase}}" {{if gt .Maxlength 0}}maxlength="{{.Maxlength}}"{{end}} {{if gt .Size 0}}size="{{.Size}}"{{end}} value="{{"{{"}}.{{.Name}}{{"}}"}}" {{with .Required}}required{{end}}>
+                                  </div>
+                                  {{- "{{"}}with $errors.{{.Name}}{{"}}"}} <p class="help is-danger">{{"{{"}}.{{"}}"}} </p>{{"{{"}}end{{"}}"}}
+                                </div>{{end}}
 {{- if eq .Type "bool"}}             <div class="field">
                                   <label class="label">{{.Name}} {{with .Required}}*{{end}}</label>
                                   <div class="control">
@@ -112,6 +119,7 @@
                                     <div class="select">
                                       <select name="{{.Name | lowercase}}" id="{{.Name | lowercase}}" value="{{"{{"}}.{{.Name}}{{"}}"}}" {{with .Required}}required{{end}}>{{"{{"}}${{.Name | lowercase}}:=.{{.Name}}{{"}}"}}
                                        {{"{{"}}range .Lookup{{.Object}}{{"}}"}}
+                                        <option>{{"{{.Text}}"}}</option>
                                  {{/*       <option value="{{"{{.Text}}"}}" {{"{{"}}if eq .{{.Text}} ${{.Name | lowercase}}{{"}}"}}readonly="readonly"{{"{{"}}end{{"}}"}}>{{"{{.Text}}"}}</option>  */}}
                                       {{"{{end}}"}}
                                       </select>

@@ -35,41 +35,50 @@ type Config struct {
 
 // Creates standard app directories
 func (c Config) CreateTargetApp() {
-	_, err := os.Lstat(c.Path + "/static")
+	_, err := os.Lstat(c.Path)
+	if err != nil {
+		err = os.Mkdir(c.Path, os.ModeDir)
+		if err != nil {
+			log.Fatalf("App directory: %s", err)
+		}
+	}
+
+	_, err = os.Lstat(c.Path + "/static")
 	if err != nil {
 		err = os.Mkdir(c.Path+"/static", os.ModeDir)
 		if err != nil {
-			log.Fatalf("Static files directory created: %s", err)
+			log.Fatalf("Static files directory: %s", err)
 		}
 	}
 	_, err = os.Lstat(c.Path + "/view")
 	if err != nil {
 		err = os.Mkdir(c.Path+"/view", os.ModeDir)
 		if err != nil {
-			log.Fatalf("Subdir created: %s", err)
+			log.Fatalf("Subdir view: %s", err)
 		}
 	}
 	_, err = os.Lstat(c.Path + "/data")
 	if err != nil {
 		err = os.Mkdir(c.Path+"/data", os.ModeDir)
 		if err != nil {
-			log.Fatalf("Subdir created: %s", err)
+			log.Fatalf("Subdir data: %s", err)
 		}
 	}
 	_, err = os.Lstat(c.Path + "/model")
 	if err != nil {
 		err = os.Mkdir(c.Path+"/model", os.ModeDir)
 		if err != nil {
-			log.Fatalf("Subdir created: %s", err)
+			log.Fatalf("Subdir model: %s", err)
 		}
 	}
 	_, err = os.Lstat(c.Path + "/controller")
 	if err != nil {
 		err = os.Mkdir(c.Path+"/controller", os.ModeDir)
 		if err != nil {
-			log.Fatalf("Subdir created: %s", err)
+			log.Fatalf("Subdir controller: %s", err)
 		}
 	}
+	log.Println("Directory structure generated or verified")
 }
 
 // copies file from "src" to "dst"
@@ -97,21 +106,27 @@ func copyFile(src, dst string) error {
 }
 
 // loops through all fields for "lookup" fields and adds a lookup entity
-func identifyLookups(list []Entity) []Entity {
+func identifyLookups(list []Entity) (entities []Entity) {
+	lookups := make(map[string]Entity)
 	_, es := GetAllEntities()
 	for _, entity := range es {
 		for _, field := range entity.Fields {
 			if field.Type == "lookup" {
-				lk := NewEntity()
-				lk.Name = field.Object
-				lk.EntityType = 1
+				lk := Entity{
+					Name:       field.Object,
+					EntityType: 1,
+				}
 				lk.AddField(Field{Name: "Text", Required: true, Type: "string"})
 				lk.AddField(Field{Name: "Order", Type: "int"})
-				list = append(list, *lk)
+				lookups[lk.Name] = lk
 			}
 		}
 	}
-	return list
+
+	for _, val := range lookups {
+		entities = append(entities, val)
+	}
+	return entities
 }
 
 // loops through all relations and adds parent/child fields or many-to-many mappingttable
@@ -214,12 +229,15 @@ func main() {
 
 	app.Name = "ProjectMgnt"
 	app.Title = "Usermanagement for eTracker Accounts"
-	app.Path = "/Users/A.Eisner/go/src/" + app.Name
+	app.Path = "/Users/Andreas Eisner/go/src/" + app.Name
 	app.CreateTargetApp()
 
 	_, app.Entities = GetAllEntities()
-	app.Entities = identifyLookups(app.Entities)
-	app.Entities = parseRelations(app.Entities)
+	app.Entities = append(app.Entities, identifyLookups(app.Entities)...)
+	repo := NewYAMLRepository("repo.yaml", app.Entities)
+	repo.Save()
+
+	//	app.Entities = append(app.Entities, parseRelations(app.Entities)...)
 	fmt.Printf("%d entities loaded.\n", len(app.Entities))
 
 	// pluralize and sigularize functions for templates

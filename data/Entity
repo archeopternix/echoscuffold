@@ -45,58 +45,6 @@
 		]
 	},
 	{
-		"id": 10,
-		"name": "Entitytype",
-		"type": 1,
-		"fields": [
-			{
-				"name": "Name",
-				"type": "string",
-				"required": true,
-				"maxlength": 80,
-				"islabel": true
-			},
-			{
-				"name": "Number",
-				"type": "number",
-				"step": 1
-			}			
-		]
-	},
-	{
-		"id": 11,
-		"name": "Fieldtype",
-		"type": 1,
-		"fields": [
-			{
-				"name": "Name",
-				"type": "string",
-				"required": true,
-				"maxlength": 80,
-				"islabel": true
-			},
-			{
-				"name": "Number",
-				"type": "number",
-				"step": 1
-			}			
-		]
-	},
-	{
-		"id": 12,
-		"name": "Relationtype",
-		"type": 1,
-		"fields": [
-			{
-				"name": "Name",
-				"type": "string",
-				"required": true,
-				"maxlength": 80,
-				"islabel": true
-			}
-		]
-	},
-	{
 		"id": 3,
 		"name": "Field",
 		"type": 0,

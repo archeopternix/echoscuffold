@@ -112,7 +112,7 @@
                                     <div class="select">
                                       <select name="{{.Name | lowercase}}" id="{{.Name | lowercase}}" value="{{"{{"}}.{{.Name}}{{"}}"}}" {{with .Required}}required{{end}}>{{"{{"}}${{.Name | lowercase}}:=.{{.Name}}{{"}}"}}
                                        {{"{{"}}range .Lookup{{.Object}}{{"}}"}}
-                                        <option value="{{"{{.Text}}"}}" {{"{{"}}if eq .{{.Text}} ${{.Name | lowercase}}{{"}}"}}readonly="readonly"{{"{{"}}end{{"}}"}}>{{"{{.Text}}"}}</option>  
+                                 {{/*       <option value="{{"{{.Text}}"}}" {{"{{"}}if eq .{{.Text}} ${{.Name | lowercase}}{{"}}"}}readonly="readonly"{{"{{"}}end{{"}}"}}>{{"{{.Text}}"}}</option>  */}}
                                       {{"{{end}}"}}
                                       </select>
                                     </div>
@@ -124,7 +124,7 @@
                                     <div class="select">
                                       <select name="{{.Name | lowercase}}id" id="{{.Name | lowercase}}id" value="{{"{{"}}.{{.Name}}Id{{"}}"}}" {{with .Required}}required{{end}}>{{"{{"}}${{.Name | lowercase}}id:=.{{.Name}}Id{{"}}"}}
                                        {{"{{"}}range .Lookup{{.Object}}{{"}}"}}
-                                        <option value="{{"{{.Id}}"}}" {{"{{"}}if eq .{{.id}} ${{.Name | lowercase}}id{{"}}"}}readonly="readonly"{{"{{"}}end{{"}}"}}>{{"{{.Label}}"}}</option>
+                                     {{/*   <option value="{{"{{.Id}}"}}" {{"{{"}}if eq .{{.id}} ${{.Name | lowercase}}id{{"}}"}}readonly="readonly"{{"{{"}}end{{"}}"}}>{{"{{.Label}}"}}</option>  */}}
                                       {{"{{end}}"}}
                                       </select>
                                     </div>

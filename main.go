@@ -212,9 +212,9 @@ var app AppModel
 func main() {
 	var err error
 
-	app.Name = "User"
+	app.Name = "ProjectMgnt"
 	app.Title = "Usermanagement for eTracker Accounts"
-	app.Path = "/Users/Andreas Eisner/go/src/" + app.Name
+	app.Path = "/Users/A.Eisner/go/src/" + app.Name
 	app.CreateTargetApp()
 
 	_, app.Entities = GetAllEntities()

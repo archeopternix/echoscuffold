@@ -130,7 +130,7 @@ func identifyLookups(list []Entity) (entities []Entity) {
 }
 
 // loops through all relations and adds parent/child fields or many-to-many mappingttable
-func parseRelations(list []Entity) []Entity {
+func parseRelations(list []Entity) {
 	rels := GetAllRelations()
 	fmt.Printf("%d relations loaded.\n", len(rels))
 	for _, relation := range rels {
@@ -144,24 +144,26 @@ func parseRelations(list []Entity) []Entity {
 				}
 			}
 		}
-		if relation.Kind == "many2many" {
-			lk := NewEntity()
-			lk.Name = relation.Parent + relation.Child
-			lk.EntityType = 2
-			lk.AddField(Field{Name: relation.Child, Type: "manychild", Object: lk.Name})
-			lk.AddField(Field{Name: relation.Parent, Type: "manychild", Object: lk.Name})
-			list = append(list, *lk)
-			for i, entity := range list {
-				if relation.Child == entity.Name {
-					list[i].AddField(Field{Name: relation.Parent, Type: "manyparent", Object: lk.Name})
+
+		// TODO: many2many
+		/*
+			if relation.Kind == "many2many" {
+				lk := NewEntity()
+				lk.Name = relation.Parent + relation.Child
+				lk.EntityType = 2
+				lk.AddField(Field{Name: relation.Child, Type: "manychild", Object: lk.Name})
+				lk.AddField(Field{Name: relation.Parent, Type: "manychild", Object: lk.Name})
+				list = append(list, *lk)
+				for i, entity := range list {
+					if relation.Child == entity.Name {
+						list[i].AddField(Field{Name: relation.Parent, Type: "manyparent", Object: lk.Name})
+					}
+					if relation.Parent == entity.Name {
+						list[i].AddField(Field{Name: relation.Child, Type: "manyparent", Object: lk.Name})
+					}
 				}
-				if relation.Parent == entity.Name {
-					list[i].AddField(Field{Name: relation.Child, Type: "manyparent", Object: lk.Name})
-				}
-			}
-		}
+			} */
 	}
-	return list
 }
 
 // generate app models and copies basic database functions
@@ -234,6 +236,10 @@ func main() {
 
 	_, app.Entities = GetAllEntities()
 	app.Entities = append(app.Entities, identifyLookups(app.Entities)...)
+	parseRelations(app.Entities)
+
+	// TODO: many to many relations with mapping objects missing
+
 	repo := NewYAMLRepository("repo.yaml", app.Entities)
 	repo.Save()
 

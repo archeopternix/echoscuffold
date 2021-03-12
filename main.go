@@ -134,6 +134,50 @@ func (a *AppModel) GenerateMainApplication() (*Engine, error) {
 	return e, nil
 }
 
+func (a *AppModel) GenerateController() (*Engine, error) {
+	e := new(Engine)
+
+	// create main directory
+	dirs := NewDirectoryGenerator()
+	if err := dirs.Add(filepath.Join(app.Path, "controller")); err != nil {
+		return nil, err
+	}
+	if err := e.AddGenerator(dirs); err != nil {
+		return nil, err
+	}
+
+	// generate model files
+	// pluralize and singularize functions for templates
+	pl := pluralize.NewClient()
+	// First we create a FuncMap with which to register the function.
+	funcMap := template.FuncMap{
+		"lowercase": strings.ToLower, "singular": pl.Singular, "plural": pl.Plural,
+	}
+	tg := NewTemplateGenerator(funcMap)
+	if err := tg.Add(tg.Template("controller").ParseFiles(filepath.Join("template", "controller.tmpl"))); err != nil {
+		return nil, (err)
+	}
+
+	for _, entity := range app.Entities {
+		app.Object = entity
+		data := struct {
+			App   AppModel
+			Model Entity
+		}{app, entity}
+
+		// add output
+		file := filepath.Join(app.Path, "controller", strings.ToLower(entity.Name)) + ".go"
+		if err := tg.ParseFilename("controller", file, data); err != nil {
+			return nil, err
+		}
+	}
+	if err := e.AddGenerator(tg); err != nil {
+		return nil, err
+	}
+
+	return e, nil
+}
+
 // Creates standard app directories
 func (c Config) CreateTargetApp() {
 	_, err := os.Lstat(c.Path)
@@ -364,6 +408,14 @@ func main() {
 	}
 
 	e, err = app.GenerateJSONDataStore()
+	if err != nil {
+		log.Fatal(err)
+	}
+	if err := e.Run(); err != nil {
+		log.Fatal(err)
+	}
+
+	e, err = app.GenerateController()
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -1,19 +1,19 @@
 {{define "controller" -}}
 // Generated code - do not modify it will be overwritten!!
-// Time: {{.Object.TimeStamp}}
+// Time: {{.Model.TimeStamp}}
 package controller
 
 import (
 	"github.com/labstack/echo"
 	"net/http"
 	"strconv"
-	. "{{.Name}}/model"
+	. "{{.App.Name}}/model"
 )
 
 // -------------------------------
 // Handlers
 // -------------------------------
-{{with .Object}}
+{{with .Model}}
 // list handler
 func List{{plural .Name}}(c echo.Context) error {
 	err, {{.Name | plural | lowercase}} := GetAll{{plural .Name}}()

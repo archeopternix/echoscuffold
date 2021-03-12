@@ -25,3 +25,10 @@ XXX/model/project.go
 XXX/model/relation.go
 XXX/model/relationtype.go
 *.exe
+XXX/controller/entity.go
+XXX/controller/entitytype.go
+XXX/controller/field.go
+XXX/controller/fieldtype.go
+XXX/controller/project.go
+XXX/controller/relation.go
+XXX/controller/relationtype.go

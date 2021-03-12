@@ -1,13 +1,13 @@
 {{define "model" -}}
 // Generated code - do not modify it will be overwritten!!
-// Time: {{.Object.TimeStamp}}
+// Time: {{.TimeStamp}}
 package model
 
 import (
 
 )
 
-{{with .Object}}
+
 type {{.Name}} struct {
 	Id     string     `json:"id"`
 {{range .Fields}}{{template "types" .}}
@@ -87,7 +87,6 @@ func (obj {{$name}}) Lookup{{$field.Object}}() ([]{{$field.Object}}) {
 }
 {{- end}}{{end}}
 
-{{end}}
 {{end}}
 
 

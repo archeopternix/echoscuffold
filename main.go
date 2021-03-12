@@ -7,9 +7,11 @@ import (
 	"io"
 	"log"
 	"os"
+	"path/filepath"
 	"strings"
 	"text/template"
 
+	. "github.com/archeopternix/filegenerator"
 	"github.com/gertd/go-pluralize"
 )
 
@@ -31,6 +33,105 @@ type Config struct {
 	Path  string
 	Name  string
 	Title string
+}
+
+func (app *AppModel) GenerateModel() (*Engine, error) {
+	e := new(Engine)
+	// generate directory structure
+	dirs := NewDirectoryGenerator()
+	if err := dirs.Add(filepath.Join(app.Path, "model")); err != nil {
+		return nil, err
+	}
+	if err := e.AddGenerator(dirs); err != nil {
+		return nil, err
+	}
+
+	// generate model files
+	// pluralize and singularize functions for templates
+	pl := pluralize.NewClient()
+	// First we create a FuncMap with which to register the function.
+	funcMap := template.FuncMap{
+		"lowercase": strings.ToLower, "singular": pl.Singular, "plural": pl.Plural,
+	}
+	tg := NewTemplateGenerator(funcMap)
+	if err := tg.Add(tg.Template("model").ParseFiles(filepath.Join("template", "model.tmpl"), filepath.Join("template", "types.tmpl"))); err != nil {
+		return nil, (err)
+	}
+
+	for _, entity := range app.Entities {
+		app.Object = entity
+
+		// add output
+		file := filepath.Join(app.Path, "model", strings.ToLower(entity.Name)) + ".go"
+		if err := tg.ParseFilename("model", file, entity); err != nil {
+			return nil, err
+		}
+	}
+	if err := e.AddGenerator(tg); err != nil {
+		return nil, err
+	}
+
+	return e, nil
+}
+
+func (a *AppModel) GenerateJSONDataStore() (*Engine, error) {
+	e := new(Engine)
+
+	// create data directory
+	dirs := NewDirectoryGenerator()
+	if err := dirs.Add(filepath.Join(app.Path, "data")); err != nil {
+		return nil, err
+	}
+	if err := e.AddGenerator(dirs); err != nil {
+		return nil, err
+	}
+
+	// Copy of database.go
+	cp := NewCopyGenerator()
+	if err := cp.Add(filepath.Join("model", "database.go"), filepath.Join(app.Path, "model")); err != nil {
+		return nil, err
+	}
+	if err := e.AddGenerator(cp); err != nil {
+		return nil, err
+	}
+
+	return e, nil
+}
+
+func (a *AppModel) GenerateMainApplication() (*Engine, error) {
+	e := new(Engine)
+
+	// create main directory
+	dirs := NewDirectoryGenerator()
+	if err := dirs.Add(filepath.Join(app.Path, "cmd")); err != nil {
+		return nil, err
+	}
+	if err := e.AddGenerator(dirs); err != nil {
+		return nil, err
+	}
+
+	// generate model files
+	// pluralize and singularize functions for templates
+	pl := pluralize.NewClient()
+	// First we create a FuncMap with which to register the function.
+	funcMap := template.FuncMap{
+		"lowercase": strings.ToLower, "singular": pl.Singular, "plural": pl.Plural,
+	}
+	tg := NewTemplateGenerator(funcMap)
+	if err := tg.Add(tg.Template("main").ParseFiles(filepath.Join("template", "main.tmpl"))); err != nil {
+		return nil, (err)
+	}
+
+	file := filepath.Join(app.Path, "cmd", "main.go")
+	if err := tg.ParseFilename("main", file, app); err != nil {
+		return nil, err
+	}
+
+	if err := e.AddGenerator(tg); err != nil {
+		return nil, err
+	}
+
+	return e, nil
 }
 
 // Creates standard app directories
@@ -229,10 +330,10 @@ var app AppModel
 func main() {
 	var err error
 
-	app.Name = "ProjectMgnt"
+	app.Name = "XXX"
 	app.Title = "Usermanagement for eTracker Accounts"
-	app.Path = "/Users/Andreas Eisner/go/src/" + app.Name
-	app.CreateTargetApp()
+	app.Path = filepath.Join("", app.Name)
+	//	app.CreateTargetApp()
 
 	_, app.Entities = GetAllEntities()
 	app.Entities = append(app.Entities, identifyLookups(app.Entities)...)
@@ -243,160 +344,188 @@ func main() {
 	repo := NewYAMLRepository("repo.yaml", app.Entities)
 	repo.Save()
 
-	//	app.Entities = append(app.Entities, parseRelations(app.Entities)...)
-	fmt.Printf("%d entities loaded.\n", len(app.Entities))
+	e := new(Engine)
 
-	// pluralize and sigularize functions for templates
-	pl := pluralize.NewClient()
-	// First we create a FuncMap with which to register the function.
-	funcMap := template.FuncMap{
-		"lowercase": strings.ToLower, "singular": pl.Singular, "plural": pl.Plural,
-	}
-
-	// Rendering the model components
-	tmpl, err := template.New("model").Funcs(funcMap).ParseFiles("template/model.tmpl", "template/types.tmpl")
+	// main application
+	e, err = app.GenerateMainApplication()
 	if err != nil {
-		log.Fatalf("Error in model templates: %s", err)
+		log.Fatal(err)
 	}
-	generateModel(tmpl)
-
-	// Rendering the controller components
-	tmpl, err = template.New("controller").Funcs(funcMap).ParseFiles("template/controller.tmpl")
-	if err != nil {
-		log.Fatalf("Error in controller templates: %s", err)
-	}
-	generateController(tmpl)
-
-	fmt.Println("views")
-	// Copy the view components
-	err = copyFile("template/base.html", app.Path+"/view/_base.html")
-	if err != nil {
-		log.Fatalf("Copy of base: %s", err)
-	}
-	err = copyFile("template/dashboard.html", app.Path+"/view/dashboard.html")
-	if err != nil {
-		log.Fatalf("Copy of dashboard: %s", err)
-	}
-	err = copyFile("template/copy/_footer.html", app.Path+"/view/_footer.html")
-	if err != nil {
-		log.Fatalf("Copy of _footer: %s", err)
-	}
-	err = copyFile("template/copy/_header.html", app.Path+"/view/_header.html")
-	if err != nil {
-		log.Fatalf("Copy of _header: %s", err)
-	}
-	err = copyFile("template/copy/_hero.html", app.Path+"/view/_hero.html")
-	if err != nil {
-		log.Fatalf("Copy of _hero: %s", err)
-	}
-	err = copyFile("template/copy/_mainnav.html", app.Path+"/view/_mainnav.html")
-	if err != nil {
-		log.Fatalf("Copy of _mainnav: %s", err)
+	if err := e.Run(); err != nil {
+		log.Fatal(err)
 	}
 
-	// Rendering the sidenav
-	sidenavtmpl, err := template.New("sidenav").Funcs(funcMap).ParseFiles("template/sidenav.html")
+	e, err = app.GenerateModel()
 	if err != nil {
-		log.Fatalf("Parse sidenav template: %s", err)
+		log.Fatal(err)
 	}
-	var output *os.File
-	defer output.Close()
-
-	output, err = os.Create(app.Path + "/view/_sidenav.html")
-	if err != nil {
-		log.Fatalf("File creation: %s", err)
-	}
-	err = sidenavtmpl.ExecuteTemplate(output, "sidenav", app)
-	if err != nil {
-		log.Fatalf("template execution: %s", err)
-	}
-	output.Close()
-
-	// Rendering the dashboard
-	dashtmpl, err := template.New("dashboard").Funcs(funcMap).ParseFiles("template/dashboard.html")
-	if err != nil {
-		log.Fatalf("Parse dashboard template: %s", err)
+	if err := e.Run(); err != nil {
+		log.Fatal(err)
 	}
 
-	defer output.Close()
+	e, err = app.GenerateJSONDataStore()
+	if err != nil {
+		log.Fatal(err)
+	}
+	if err := e.Run(); err != nil {
+		log.Fatal(err)
+	}
+	/*
 
-	output, err = os.Create(app.Path + "/view/dashboard.html")
-	if err != nil {
-		log.Fatalf("File creation: %s", err)
-	}
-	err = dashtmpl.ExecuteTemplate(output, "dashboard", app)
-	if err != nil {
-		log.Fatalf("template execution: %s", err)
-	}
-	output.Close()
+		//	app.Entities = append(app.Entities, parseRelations(app.Entities)...)
+		fmt.Printf("%d entities loaded.\n", len(app.Entities))
 
-	// Rendering the list view components
-	listtmpl, _ := template.New("list").Funcs(funcMap).ParseFiles("template/list.html")
-	if err != nil {
-		log.Fatalf("Parse list template: %s", err)
-	}
-	for _, e := range app.Entities {
+		// pluralize and sigularize functions for templates
+		pl := pluralize.NewClient()
+		// First we create a FuncMap with which to register the function.
+		funcMap := template.FuncMap{
+			"lowercase": strings.ToLower, "singular": pl.Singular, "plural": pl.Plural,
+		}
+
+		// Rendering the model components
+		tmpl, err := template.New("model").Funcs(funcMap).ParseFiles("template/model.tmpl", "template/types.tmpl")
+		if err != nil {
+			log.Fatalf("Error in model templates: %s", err)
+		}
+		generateModel(tmpl)
+
+		// Rendering the controller components
+		tmpl, err = template.New("controller").Funcs(funcMap).ParseFiles("template/controller.tmpl")
+		if err != nil {
+			log.Fatalf("Error in controller templates: %s", err)
+		}
+		generateController(tmpl)
+
+		fmt.Println("views")
+		// Copy the view components
+		err = copyFile("template/base.html", app.Path+"/view/_base.html")
+		if err != nil {
+			log.Fatalf("Copy of base: %s", err)
+		}
+		err = copyFile("template/dashboard.html", app.Path+"/view/dashboard.html")
+		if err != nil {
+			log.Fatalf("Copy of dashboard: %s", err)
+		}
+		err = copyFile("template/copy/_footer.html", app.Path+"/view/_footer.html")
+		if err != nil {
+			log.Fatalf("Copy of _footer: %s", err)
+		}
+		err = copyFile("template/copy/_header.html", app.Path+"/view/_header.html")
+		if err != nil {
+			log.Fatalf("Copy of _header: %s", err)
+		}
+		err = copyFile("template/copy/_hero.html", app.Path+"/view/_hero.html")
+		if err != nil {
+			log.Fatalf("Copy of _hero: %s", err)
+		}
+		err = copyFile("template/copy/_mainnav.html", app.Path+"/view/_mainnav.html")
+		if err != nil {
+			log.Fatalf("Copy of _mainnav: %s", err)
+		}
+
+		// Rendering the sidenav
+		sidenavtmpl, err := template.New("sidenav").Funcs(funcMap).ParseFiles("template/sidenav.html")
+		if err != nil {
+			log.Fatalf("Parse sidenav template: %s", err)
+		}
 		var output *os.File
 		defer output.Close()
 
-		output, _ = os.Create(app.Path + "/view/" + strings.ToLower(e.Name) + "list.html")
-
-		err = listtmpl.ExecuteTemplate(output, "list", e)
+		output, err = os.Create(app.Path + "/view/_sidenav.html")
+		if err != nil {
+			log.Fatalf("File creation: %s", err)
+		}
+		err = sidenavtmpl.ExecuteTemplate(output, "sidenav", app)
 		if err != nil {
 			log.Fatalf("template execution: %s", err)
 		}
-	}
+		output.Close()
 
-	// Rendering the listtable view components
-	listtabletmpl, _ := template.New("list").Funcs(funcMap).ParseFiles("template/listtable.html")
-	if err != nil {
-		log.Fatalf("Parse list template: %s", err)
-	}
-	for _, e := range app.Entities {
-		var output *os.File
+		// Rendering the dashboard
+		dashtmpl, err := template.New("dashboard").Funcs(funcMap).ParseFiles("template/dashboard.html")
+		if err != nil {
+			log.Fatalf("Parse dashboard template: %s", err)
+		}
+
 		defer output.Close()
 
-		output, _ = os.Create(app.Path + "/view/" + strings.ToLower(e.Name) + "listtable.html")
-
-		err = listtabletmpl.ExecuteTemplate(output, "listtable", e)
+		output, err = os.Create(app.Path + "/view/dashboard.html")
+		if err != nil {
+			log.Fatalf("File creation: %s", err)
+		}
+		err = dashtmpl.ExecuteTemplate(output, "dashboard", app)
 		if err != nil {
 			log.Fatalf("template execution: %s", err)
 		}
-	}
+		output.Close()
 
-	// Rendering the detailview components
-	detailtmpl, _ := template.New("detail").Funcs(funcMap).ParseFiles("template/detail.html")
-	if err != nil {
-		log.Fatalf("Parse detail template: %s", err)
-	}
-	for _, e := range app.Entities {
-		var output *os.File
-		defer output.Close()
+		// Rendering the list view components
+		listtmpl, _ := template.New("list").Funcs(funcMap).ParseFiles("template/list.html")
+		if err != nil {
+			log.Fatalf("Parse list template: %s", err)
+		}
+		for _, e := range app.Entities {
+			var output *os.File
+			defer output.Close()
 
-		output, _ = os.Create(app.Path + "/view/" + strings.ToLower(e.Name) + "detail.html")
+			output, _ = os.Create(app.Path + "/view/" + strings.ToLower(e.Name) + "list.html")
 
-		err = detailtmpl.ExecuteTemplate(output, "detail", e)
+			err = listtmpl.ExecuteTemplate(output, "list", e)
+			if err != nil {
+				log.Fatalf("template execution: %s", err)
+			}
+		}
+
+		// Rendering the listtable view components
+		listtabletmpl, _ := template.New("list").Funcs(funcMap).ParseFiles("template/listtable.html")
+		if err != nil {
+			log.Fatalf("Parse list template: %s", err)
+		}
+		for _, e := range app.Entities {
+			var output *os.File
+			defer output.Close()
+
+			output, _ = os.Create(app.Path + "/view/" + strings.ToLower(e.Name) + "listtable.html")
+
+			err = listtabletmpl.ExecuteTemplate(output, "listtable", e)
+			if err != nil {
+				log.Fatalf("template execution: %s", err)
+			}
+		}
+
+		// Rendering the detailview components
+		detailtmpl, _ := template.New("detail").Funcs(funcMap).ParseFiles("template/detail.html")
+		if err != nil {
+			log.Fatalf("Parse detail template: %s", err)
+		}
+		for _, e := range app.Entities {
+			var output *os.File
+			defer output.Close()
+
+			output, _ = os.Create(app.Path + "/view/" + strings.ToLower(e.Name) + "detail.html")
+
+			err = detailtmpl.ExecuteTemplate(output, "detail", e)
+			if err != nil {
+				log.Fatalf("template execution: %s", err)
+			}
+		}
+
+		// Application classes:
+
+		// Rendering the main.go
+		maintmpl, err := template.New("main").Funcs(funcMap).ParseFiles("template/main.tmpl")
+		if err != nil {
+			log.Fatalf("Parse main.go template: %s", err)
+		}
+
+		output, err = os.Create(app.Path + "/main.go")
+		if err != nil {
+			log.Fatalf("File creation: %s", err)
+		}
+		err = maintmpl.ExecuteTemplate(output, "main", app)
 		if err != nil {
 			log.Fatalf("template execution: %s", err)
 		}
-	}
-
-	// Application classes:
-
-	// Rendering the main.go
-	maintmpl, err := template.New("main").Funcs(funcMap).ParseFiles("template/main.tmpl")
-	if err != nil {
-		log.Fatalf("Parse main.go template: %s", err)
-	}
-
-	output, err = os.Create(app.Path + "/main.go")
-	if err != nil {
-		log.Fatalf("File creation: %s", err)
-	}
-	err = maintmpl.ExecuteTemplate(output, "main", app)
-	if err != nil {
-		log.Fatalf("template execution: %s", err)
-	}
-	output.Close()
-
+		output.Close()
+	*/
 }

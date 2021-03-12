@@ -14,3 +14,14 @@ echoscuffold.exe
 repo.yaml
 *.exe
 *.exe
+echoscuffold.exe
+XXX/cmd/main.go
+XXX/model/database.go
+XXX/model/entity.go
+XXX/model/entitytype.go
+XXX/model/field.go
+XXX/model/fieldtype.go
+XXX/model/project.go
+XXX/model/relation.go
+XXX/model/relationtype.go
+*.exe

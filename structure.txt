@@ -1,8 +1,0 @@
-APP
-- repository
-- logic
-- model
-- frontend
--- controller
--- html
-- vendor

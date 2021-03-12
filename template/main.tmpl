@@ -9,6 +9,7 @@ import (
 	"github.com/labstack/echo/middleware"
 )
 
+
 type Template struct {
 	templates *template.Template
 }
@@ -27,7 +28,7 @@ func main() {
 	// Instantiate a template registry with an array of template set
 	// Ref: https://gist.github.com/rand99/808e6e9702c00ce64803d94abff65678
 	renderer := &Template{
-		templates: template.Must(template.ParseGlob("view/*.html")),
+		templates: template.Must(template.ParseGlob("../view/*.html")),
 	}
 	e.Renderer = renderer
 

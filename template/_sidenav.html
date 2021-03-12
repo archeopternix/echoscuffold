@@ -6,8 +6,7 @@
                       General
                   </p>
                     <ul class="menu-list">
-                        <li><a class="is-active" href="/">Dashboard</a></li>
-                        <li><a>Other</a></li>
+                        <li><a {{"{{"}}if eq .Slug "Dashboard" {{"}}"}}class="is-active"{{"{{"}}end{{"}}"}}  href="/">Dashboard</a></li>
                     </ul>
                   <p class="menu-label">
                       Administration
@@ -15,9 +14,9 @@
                     <ul class="menu-list">
                     <li><a>Masterdata</a>
                     {{range .Entities}}
-                    {{- if eq .EntityType 0}}                       
+                    {{- if eq .EntityType 0}}               
                           <ul>
-                              <li><a href="/{{.Name | plural | lowercase}}">{{plural .Name}}</a></li>
+                              <li><a {{"{{"}}if eq .Slug "{{.Name | plural}}" {{"}}"}}class="is-active"{{"{{"}}end{{"}}"}} href="/{{.Name | plural | lowercase}}">{{plural .Name}}</a></li>
                           </ul>
                      {{- end}}
                     {{- end}}
@@ -26,7 +25,7 @@
                     {{range .Entities}}
                     {{- if eq .EntityType 1}}
                           <ul>
-                              <li><a href="/{{.Name | plural | lowercase}}">{{plural .Name}}</a></li>
+                              <li><a {{"{{"}}if eq .Slug "{{.Name | plural}}" {{"}}"}}class="is-active"{{"{{"}}end{{"}}"}} href="/{{.Name | plural | lowercase}}">{{plural .Name}}</a></li>
                           </ul>
                     {{- end}}
                     {{- end}}

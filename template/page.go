@@ -7,19 +7,18 @@ import (
 )
 
 type Page struct {
-	Title string
-	Data  interface{}
+	Title  string
+	Slug   string
+	Data   interface{}
 	Errors map[string]string
 }
 
-
-
-func NewPage(title string) *Page {
-	p := &Page{Title: title}
+func NewPage(title string, slug string) *Page {
+	p := &Page{Title: title, Slug: slug}
 	return p
 }
 
 func Dashboard(c echo.Context) error {
-	p := NewPage("Dashboard")
+	p := NewPage("Dashboard", "Dashboard")
 	return c.Render(http.StatusOK, "dashboard", p)
 }

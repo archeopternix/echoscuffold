@@ -20,7 +20,7 @@ func List{{plural .Name}}(c echo.Context) error {
 	if err != nil {
 		return echo.NewHTTPError(http.StatusNotFound, "{{plural .Name}} not found")
 	}
-	p:=NewPage("{{.Name | plural}}")
+	p:=NewPage("{{.Name | plural}}", "{{.Name | plural}}")
 	p.Data = {{.Name | plural | lowercase}}
 	return c.Render(http.StatusOK, "{{lowercase .Name}}list", p)
 }
@@ -37,7 +37,7 @@ func Get{{.Name}}(c echo.Context) error {
 	{{range .Fields}}{{if eq .Type "parent"}}
 	_, {{lowercase $name}}.{{.Name | plural}} = GetAll{{.Object | plural}}By{{$name}}Id(id)
 	{{end}}{{end}}
-	p:=NewPage("Edit {{.Name}}")
+	p:=NewPage("Edit {{.Name}}", "{{.Name | plural}}")
 	p.Data = {{lowercase .Name}}	
 
 	return c.Render(http.StatusOK, "{{lowercase .Name}}detail", p)
@@ -47,7 +47,7 @@ func Get{{.Name}}(c echo.Context) error {
 func New{{.Name}}(c echo.Context) error {
 	{{lowercase .Name}} := new({{.Name}})
 	
-	p:=NewPage("New {{.Name}}")
+	p:=NewPage("New {{.Name}}", "{{.Name | plural}}")
 	p.Data = {{lowercase .Name}}
 
 	return c.Render(http.StatusOK, "{{lowercase .Name}}detail", p)
@@ -60,7 +60,7 @@ func Create{{.Name}}(c echo.Context) (err error) {
 		return echo.NewHTTPError(http.StatusNotFound, "{{.Name}} could not bound to params")
   	}
 
-	p:=NewPage("Error {{.Name}}")
+	p:=NewPage("Error {{.Name}}", "{{.Name | plural}}")
 	p.Data = {{lowercase .Name}}
 	
 	if validate{{.Name}}(p) == false {

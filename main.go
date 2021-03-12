@@ -146,6 +146,14 @@ func (a *AppModel) GenerateController() (*Engine, error) {
 		return nil, err
 	}
 
+	cp := NewCopyGenerator()
+	if err := cp.Add(filepath.Join("template", "page.go"), filepath.Join(app.Path, "controller")); err != nil {
+		return nil, err
+	}
+	if err := e.AddGenerator(cp); err != nil {
+		return nil, err
+	}
+
 	// generate model files
 	// pluralize and singularize functions for templates
 	pl := pluralize.NewClient()
@@ -171,6 +179,117 @@ func (a *AppModel) GenerateController() (*Engine, error) {
 			return nil, err
 		}
 	}
+	if err := e.AddGenerator(tg); err != nil {
+		return nil, err
+	}
+
+	return e, nil
+}
+
+//-------
+func (app *AppModel) GenerateView() (*Engine, error) {
+	e := new(Engine)
+
+	// create view directory
+	dirs := NewDirectoryGenerator()
+	if err := dirs.Add(filepath.Join(app.Path, "view")); err != nil {
+		return nil, err
+	}
+	if err := e.AddGenerator(dirs); err != nil {
+		return nil, err
+	}
+
+	// Copy of files
+	cp := NewCopyGenerator()
+	if err := cp.Add(filepath.Join("template", "_base.html"), filepath.Join(app.Path, "view")); err != nil {
+		return nil, err
+	}
+	if err := cp.Add(filepath.Join("template", "_dashboard.html"), filepath.Join(app.Path, "view")); err != nil {
+		return nil, err
+	}
+	if err := cp.Add(filepath.Join("template", "copy", "_footer.html"), filepath.Join(app.Path, "view")); err != nil {
+		return nil, err
+	}
+	if err := cp.Add(filepath.Join("template", "copy", "_header.html"), filepath.Join(app.Path, "view")); err != nil {
+		return nil, err
+	}
+	if err := cp.Add(filepath.Join("template", "copy", "_hero.html"), filepath.Join(app.Path, "view")); err != nil {
+		return nil, err
+	}
+	if err := cp.Add(filepath.Join("template", "copy", "_mainnav.html"), filepath.Join(app.Path, "view")); err != nil {
+		return nil, err
+	}
+	if err := e.AddGenerator(cp); err != nil {
+		return nil, err
+	}
+
+	// generate model files
+	// pluralize and singularize functions for templates
+	pl := pluralize.NewClient()
+	// First we create a FuncMap with which to register the function.
+	funcMap := template.FuncMap{
+		"lowercase": strings.ToLower, "singular": pl.Singular, "plural": pl.Plural,
+	}
+	tg := NewTemplateGenerator(funcMap)
+
+	// SideNav
+	if err := tg.Add(tg.Template("sidenav").ParseFiles(filepath.Join("template", "_sidenav.html"))); err != nil {
+		return nil, (err)
+	}
+	file := filepath.Join(app.Path, "view", "_sidenav.html")
+	if err := tg.ParseFilename("sidenav", file, app); err != nil {
+		return nil, err
+	}
+
+	// Dashboard
+	if err := tg.Add(tg.Template("dashboard").ParseFiles(filepath.Join("template", "_dashboard.html"))); err != nil {
+		return nil, (err)
+	}
+	file = filepath.Join(app.Path, "view", "_dashboard.html")
+	if err := tg.ParseFilename("dashboard", file, app); err != nil {
+		return nil, err
+	}
+
+	// List Views
+	if err := tg.Add(tg.Template("list").ParseFiles(filepath.Join("template", "list.html"))); err != nil {
+		return nil, (err)
+	}
+	for _, entity := range app.Entities {
+		// add output
+		file := filepath.Join(app.Path, "view", strings.ToLower(entity.Name)) + "list.html"
+		if err := tg.ParseFilename("list", file, entity); err != nil {
+			return nil, err
+		}
+	}
+
+	// Listtable Views
+	if err := tg.Add(tg.Template("listtable").ParseFiles(filepath.Join("template", "listtable.html"))); err != nil {
+		return nil, (err)
+	}
+	for _, entity := range app.Entities {
+		app.Object = entity
+
+		// add output
+		file := filepath.Join(app.Path, "view", strings.ToLower(entity.Name)) + "listtable.html"
+		if err := tg.ParseFilename("listtable", file, entity); err != nil {
+			return nil, err
+		}
+	}
+
+	// Detail Views
+	if err := tg.Add(tg.Template("detail").ParseFiles(filepath.Join("template", "detail.html"))); err != nil {
+		return nil, (err)
+	}
+	for _, entity := range app.Entities {
+		app.Object = entity
+
+		// add output
+		file := filepath.Join(app.Path, "view", strings.ToLower(entity.Name)) + "detail.html"
+		if err := tg.ParseFilename("detail", file, entity); err != nil {
+			return nil, err
+		}
+	}
+
 	if err := e.AddGenerator(tg); err != nil {
 		return nil, err
 	}
@@ -376,7 +495,7 @@ func main() {
 
 	app.Name = "XXX"
 	app.Title = "Usermanagement for eTracker Accounts"
-	app.Path = filepath.Join("", app.Name)
+	app.Path = filepath.Join("\\Users", "A.Eisner", "go", "src", app.Name)
 	//	app.CreateTargetApp()
 
 	_, app.Entities = GetAllEntities()
@@ -416,6 +535,14 @@ func main() {
 	}
 
 	e, err = app.GenerateController()
+	if err != nil {
+		log.Fatal(err)
+	}
+	if err := e.Run(); err != nil {
+		log.Fatal(err)
+	}
+
+	e, err = app.GenerateView()
 	if err != nil {
 		log.Fatal(err)
 	}
